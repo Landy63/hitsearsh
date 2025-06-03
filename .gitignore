@@ -1,0 +1,11 @@
+# Ignorer caches Python
+__pycache__/
+*.pyc
+
+# Ignorer fichiers de configuration locaux
+.DS_Store
+
+# Ignorer gros fichiers ZIP éventuels
+static/cards/*.zip
+
+# (Ajoutez ici toute autre règle spécifique)

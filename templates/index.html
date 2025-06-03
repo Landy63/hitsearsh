@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Recherche de cartes Pokémon</title>
+  <style>
+    body {
+      background-color: #2e2e2e;
+      color: #eee;
+      font-family: sans-serif;
+      margin: 0; padding: 0;
+    }
+    .container { display: flex; }
+    .filtres {
+      flex: 0 0 280px;
+      padding: 10px;
+      background-color: #3a3a3a;
+      height: 100vh;
+      overflow-y: auto;
+    }
+    .grille {
+      flex: 1;
+      padding: 10px;
+      overflow-y: scroll;
+      height: 100vh;
+    }
+    .carte {
+      display: inline-block;
+      margin: 5px;
+      vertical-align: top;
+    }
+    .carte img {
+      width: 150px;
+      height: auto;
+      border: 1px solid #555;
+      border-radius: 4px;
+    }
+    .miniature {
+      cursor: pointer;
+    }
+    .btn-filtrer {
+      margin-top: 10px;
+      padding: 6px 12px;
+      background: #4a90e2;
+      color: white;
+      border: none;
+      cursor: pointer;
+      border-radius: 3px;
+    }
+    /* Lightbox backdrop (overlay) */
+    #lightbox-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background-color: rgba(0, 0, 0, 0.8);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      transition: opacity 0.3s ease;
+      opacity: 0;
+      z-index: 999;
+    }
+    #lightbox-overlay img {
+      max-width: 90vw;
+      max-height: 90vh;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+      border-radius: 8px;
+      transition: transform 0.3s ease;
+      transform: scale(0.8);
+    }
+    #lightbox-overlay.visible {
+      display: flex;
+      opacity: 1;
+    }
+    #lightbox-overlay.visible img {
+      transform: scale(1);
+    }
+  </style>
+</head>
+<body>
+  <form id="form-filtres" method="get" action="/">
+    <div class="container">
+      <div class="filtres">
+        <h3>RARETÉ</h3>
+        {% for r in rarities|sort %}
+          <div>
+            <input type="checkbox" name="rarity" value="{{ r }}"
+              {% if r in selected_rarities %}checked{% endif %}
+              onchange="document.getElementById('form-filtres').submit()">
+            <label>{{ r }}</label>
+          </div>
+        {% endfor %}
+        <h3>TYPE DE CARTE</h3>
+        {% for t in types|sort %}
+          {% if not t.endswith('-BASE') %}
+            <div>
+              <input type="checkbox" name="type" value="{{ t }}"
+                {% if t in selected_types %}checked{% endif %}
+                onchange="document.getElementById('form-filtres').submit()">
+              <label>{{ t }}</label>
+            </div>
+          {% endif %}
+        {% endfor %}
+        <h3>STYLE DE CARTE</h3>
+        {% for s in styles|sort %}
+          {% if s != "BASE" %}
+            <div>
+              <input type="checkbox" name="style" value="{{ s }}"
+                {% if s in selected_styles %}checked{% endif %}
+                onclick="toggleSubstyles(this)"
+                onchange="document.getElementById('form-filtres').submit()">
+              <label>{{ s }}</label>
+            </div>
+          {% endif %}
+        {% endfor %}
+        {# Déterminer individuellement quelles options afficher #}
+        {% set show_no_alternative = ("V" in selected_types) or ("VMAX" in selected_types) or ("VSTAR" in selected_types) %}
+        {% set show_no_characters = ("V" in selected_types) or ("VMAX" in selected_types) %}
+        {% set show_no_fullart = "V" in selected_types %}
+        {% set show_no_gold = ("V" in selected_types) or ("VMAX" in selected_types) or ("VSTAR" in selected_types) or ("FULL ART" in selected_styles) %}
+        {% set show_no_holo_shiny = ("S" in selected_rarities) or ("SHINY" in selected_styles) %}
+        {% set show_no_k_shiny = ("K" in selected_rarities) or ("SHINY" in selected_styles) %}
+        {% set show_no_rainbow = ("VMAX" in selected_types) or ("VSTAR" in selected_types) %}
+        {% set show_no_shiny = ("V" in selected_types) or ("VMAX" in selected_types) or ("FULL ART" in selected_styles) %}
+        {% set show_no_trainers = "FULL ART" in selected_styles %}
+        {% set show_no_v_shiny = "V" in selected_types %}
+        {% set show_no_vmax_shiny = "VMAX" in selected_types %}
+
+        {% if ("GOLD" in selected_styles) or show_no_alternative or show_no_characters or show_no_fullart or show_no_gold or show_no_holo_shiny or show_no_k_shiny or show_no_rainbow or show_no_shiny or show_no_trainers or show_no_v_shiny or show_no_vmax_shiny %}
+          <h3>OPTIONS SUPPLÉMENTAIRES</h3>
+          {% if "GOLD" in selected_styles %}
+            {% set gold_subs = ["ALTERNATIVE", "BASE", "BLACK GOLD", "GOLD METAL", "POKEMON"] %}
+            {% for sub in gold_subs %}
+              <div>
+                <input type="checkbox" name="sub_{{ sub }}" value="{{ sub }}"
+                  {% if selected_substyles.get("GOLD") and sub in selected_substyles["GOLD"] %}checked{% endif %}
+                  onchange="document.getElementById('form-filtres').submit()">
+                <label>{{ sub }}</label>
+              </div>
+            {% endfor %}
+          {% endif %}
+          {% if show_no_alternative %}
+            <div>
+              <input type="checkbox" name="no_alternative" value="1"
+                {% if request.args.get('no_alternative') %}checked{% endif %}
+                onchange="document.getElementById('form-filtres').submit()">
+              <label>NO ALTERNATIVE</label>
+            </div>
+          {% endif %}
+          {% if show_no_characters %}
+            <div>
+              <input type="checkbox" name="no_characters" value="1"
+                {% if request.args.get('no_characters') %}checked{% endif %}
+                onchange="document.getElementById('form-filtres').submit()">
+              <label>NO CHARACTERS RARES</label>
+            </div>
+          {% endif %}
+          {% if show_no_fullart %}
+            <div>
+              <input type="checkbox" name="no_fullart" value="1"
+                {% if request.args.get('no_fullart') %}checked{% endif %}
+                onchange="document.getElementById('form-filtres').submit()">
+              <label>NO FULL ART</label>
+            </div>
+          {% endif %}
+          {% if show_no_gold %}
+            <div>
+              <input type="checkbox" name="no_gold" value="1"
+                {% if request.args.get('no_gold') %}checked{% endif %}
+                onchange="document.getElementById('form-filtres').submit()">
+              <label>NO GOLD</label>
+            </div>
+          {% endif %}
+          {% if show_no_holo_shiny %}
+            <div>
+              <input type="checkbox" name="no_holo_shiny" value="1"
+                {% if request.args.get('no_holo_shiny') %}checked{% endif %}
+                onchange="document.getElementById('form-filtres').submit()">
+              <label>NO HOLO SHINY</label>
+            </div>
+          {% endif %}
+          {% if show_no_k_shiny %}
+            <div>
+              <input type="checkbox" name="no_k_shiny" value="1"
+                {% if request.args.get('no_k_shiny') %}checked{% endif %}
+                onchange="document.getElementById('form-filtres').submit()">
+              <label>NO K SHINY</label>
+            </div>
+          {% endif %}
+          {% if show_no_rainbow %}
+            <div>
+              <input type="checkbox" name="no_rainbow" value="1"
+                {% if request.args.get('no_rainbow') %}checked{% endif %}
+                onchange="document.getElementById('form-filtres').submit()">
+              <label>NO RAINBOW</label>
+            </div>
+          {% endif %}
+          {% if show_no_shiny %}
+            <div>
+              <input type="checkbox" name="no_shiny" value="1"
+                {% if request.args.get('no_shiny') %}checked{% endif %}
+                onchange="document.getElementById('form-filtres').submit()">
+              <label>NO SHINY</label>
+            </div>
+          {% endif %}
+          {% if show_no_v_shiny %}
+            <div>
+              <input type="checkbox" name="no_v_shiny" value="1"
+                {% if request.args.get('no_v_shiny') %}checked{% endif %}
+                onchange="document.getElementById('form-filtres').submit()">
+              <label>NO V SHINY</label>
+            </div>
+          {% endif %}
+          {% if show_no_vmax_shiny %}
+            <div>
+              <input type="checkbox" name="no_vmax_shiny" value="1"
+                {% if request.args.get('no_vmax_shiny') %}checked{% endif %}
+                onchange="document.getElementById('form-filtres').submit()">
+              <label>NO VMAX SHINY</label>
+            </div>
+          {% endif %}
+          {% if show_no_trainers %}
+            <div>
+              <input type="checkbox" name="no_trainers" value="1"
+                {% if request.args.get('no_trainers') %}checked{% endif %}
+                onchange="document.getElementById('form-filtres').submit()">
+              <label>NO TRAINERS</label>
+            </div>
+          {% endif %}
+        {% endif %}
+        <!-- Le bouton Filtrer a été retiré : soumission automatique à chaque changement -->
+      </div>
+      <div class="grille">
+        <h4>{{ cartes|length }} cartes trouvées</h4>
+        <div>
+          {% for chemin in cartes %}
+            <div class="carte">
+              <img class="miniature" src="{{ url_for('static', filename=chemin) }}" alt="{{ chemin }}">
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+    <!-- Champ caché pour sous-styles -->
+    <input type="hidden" id="hidden_substyles" name="substyles"
+      value="{% if selected_substyles %}GOLD:{{ selected_substyles|join(',') }}{% endif %}">
+  </form>
+
+  <script>
+    // Affiche/masque les sous-catégories pour "Gold" et "FULL ART"
+    function toggleSubstyles(cb) {
+      // Existing GOLD handling
+      if (cb.value === 'GOLD') {
+        let subDiv = document.getElementById('sub-GOLD');
+        if (cb.checked) {
+          subDiv.style.display = 'block';
+        } else {
+          subDiv.querySelectorAll('input[type=checkbox]').forEach(i => i.checked = false);
+          subDiv.style.display = 'none';
+        }
+      }
+      // Add FULL ART handling
+      if (cb.value === 'FULL ART') {
+        let subFull = document.getElementById('sub-FULL_ART');
+        if (cb.checked) {
+          subFull.style.display = 'block';
+        } else {
+          subFull.querySelectorAll('input[type=checkbox]').forEach(i => i.checked = false);
+          subFull.style.display = 'none';
+        }
+      }
+    }
+
+    // Affiche le sous-style GOLD et FULL ART si déjà sélectionné au chargement
+    document.addEventListener('DOMContentLoaded', function() {
+      // GOLD
+      var goldCheckbox = Array.from(document.querySelectorAll('input[name="style"]')).find(cb => cb.value === 'GOLD');
+      var subGold = document.getElementById('sub-GOLD');
+      if (goldCheckbox && goldCheckbox.checked) {
+        subGold.style.display = 'block';
+      } else {
+        subGold.style.display = 'none';
+      }
+      // FULL ART
+      var faCheckbox = Array.from(document.querySelectorAll('input[name="style"]')).find(cb => cb.value === 'FULL ART');
+      var subFull = document.getElementById('sub-FULL_ART');
+      if (faCheckbox && faCheckbox.checked) {
+        subFull.style.display = 'block';
+      } else {
+        subFull.style.display = 'none';
+      }
+    });
+
+    // Avant la soumission, on met à jour le champ caché "substyles"
+    document.getElementById('form-filtres').addEventListener('submit', function(e) {
+      let subChecked = [];
+      document.querySelectorAll('#sub-GOLD input[type=checkbox]').forEach(i => {
+        if (i.checked) subChecked.push(i.value);
+      });
+      let hidden = document.getElementById('hidden_substyles');
+      if (subChecked.length > 0) {
+        hidden.value = 'GOLD:' + subChecked.join(',');
+      } else {
+        hidden.value = '';
+      }
+    });
+  </script>
+</body>
+  <!-- Lightbox overlay -->
+  <div id="lightbox-overlay">
+    <img src="" alt="Carte agrandie">
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const overlay = document.getElementById('lightbox-overlay');
+      const overlayImg = overlay.querySelector('img');
+
+      document.querySelectorAll('img.miniature').forEach(function(img) {
+        img.addEventListener('click', function(event) {
+          event.preventDefault();
+          overlayImg.src = this.src;
+          overlayImg.alt = this.alt || "Carte agrandie";
+          overlay.classList.add('visible');
+        });
+      });
+
+      overlay.addEventListener('click', function(e) {
+        if (e.target === overlay) {
+          overlay.classList.remove('visible');
+          setTimeout(() => { overlayImg.src = ""; }, 300);
+        }
+      });
+    });
+  </script>
+</html>
