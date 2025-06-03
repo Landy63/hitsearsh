@@ -73,6 +73,20 @@ DECK_ORDER = [
     "SPO"
 ]
 
+# Regroupement des séries par ères (inclut codes de séries, decks et promos)
+ERA_TO_SERIES = {
+    "SWORD_AND_SHIELD": SERIES_ORDER + DECK_ORDER,
+    # À compléter plus tard pour d’autres ères, ex.:
+    # "SUN_AND_MOON": ["SM1", "SM2", ...],
+}
+
+# Correspondance entre clé d'ère et nom de dossier
+ERA_TO_FOLDER = {
+    "SWORD_AND_SHIELD": "S&S",
+    # ajouter d'autres ères ultérieurement si nécessaire
+}
+
+
 # Ordre de sortie des RARETÉS (en majuscule)
 RARITY_ORDER = ["AR", "CHR", "CSR", "A", "K", "S", "DECK", "HR", "PROMO", "RR", "RRR", "SAR", "SR", "SSR", "UR"]
 
@@ -97,7 +111,10 @@ def lister_toutes_les_cartes():
                 cartes.append(rel_path.upper())
     return cartes
 
-def filter_cards(cartes, selected_rarities, selected_types, selected_styles, selected_substyles, selected_excluded_styles, no_fullart=False, no_characters=False, no_trainers=False, no_gold_opt=False, no_shiny_opt=False, no_alternative_opt=False, no_rainbow_opt=False, no_v_shiny=False, no_vmax_shiny=False, no_holo_shiny=False, no_k_shiny=False):
+def filter_cards(cartes, selected_rarities, selected_types, selected_styles, selected_substyles, selected_excluded_styles,
+                 no_fullart=False, no_characters=False, no_trainers=False, no_gold_opt=False, no_shiny_opt=False,
+                 no_alternative_opt=False, no_rainbow_opt=False, no_v_shiny=False, no_vmax_shiny=False,
+                 no_holo_shiny=False, no_k_shiny=False, selected_eras=None, selected_series=None, selected_decks=None):
     """
     Applique la charte sur la liste de chemins relatifs (en MAJUSCULE pour simplifier).
     """
@@ -232,6 +249,22 @@ def filter_cards(cartes, selected_rarities, selected_types, selected_styles, sel
 
     résultats = []
     for chemin in cartes:
+        name = os.path.basename(chemin).upper()
+        path_upper = chemin.upper()
+
+        # Si l'utilisateur a coché une ou plusieurs séries ou decks
+        if selected_series or selected_decks:
+            match_series = any(name.startswith(f"{ser}_") for ser in selected_series) if selected_series else False
+            match_deck = any(name.startswith(f"{deck}_") for deck in selected_decks) if selected_decks else False
+            if not (match_series or match_deck):
+                continue
+
+        # Filtrer par ère si spécifié (vérifier dossier associé à l'ère)
+        if selected_eras:
+            if not any(f"/{ERA_TO_FOLDER.get(era, era)}/".upper() in path_upper for era in selected_eras):
+                continue
+
+        # Replacer name pour les filtres suivants
         name = chemin.upper()
 
         # Filtrage spécifique V / VMAX / VSTAR
@@ -316,6 +349,17 @@ def index():
     selected_styles = [s.upper() for s in request.args.getlist('style')]
     selected_excluded_styles = [s.upper() for s in request.args.getlist('exclude_style')]
 
+    # Sélection des ères de série
+    selected_eras = [e.upper() for e in request.args.getlist('era')]
+    # Sélection des codes de série
+    selected_series = [s.upper() for s in request.args.getlist('series')]
+    # Sélection des codes de decks
+    selected_decks = [d.upper() for d in request.args.getlist('deck')]
+    # Construire la liste des séries autorisées pour l’affichage de l’accordéon
+    allowed_series = []
+    for era in selected_eras:
+        allowed_series.extend(ERA_TO_SERIES.get(era, []))
+
     # Options supplémentaires
     no_characters = 'no_characters' in request.args
     no_trainers = 'no_trainers' in request.args
@@ -366,7 +410,10 @@ def index():
         no_v_shiny,
         no_vmax_shiny,
         no_holo_shiny,
-        no_k_shiny
+        no_k_shiny,
+        selected_eras,
+        selected_series,
+        selected_decks
     )
 
     def sort_key(path):
@@ -405,7 +452,14 @@ def index():
         selected_rarities=selected_rarities,
         selected_types=selected_types,
         selected_styles=selected_styles,
-        selected_substyles=selected_substyles
+        selected_substyles=selected_substyles,
+        eras=list(ERA_TO_SERIES.keys()),
+        series=SERIES_ORDER,
+        decks=DECK_ORDER,
+        selected_eras=selected_eras,
+        selected_series=selected_series,
+        selected_decks=selected_decks,
+        allowed_series=allowed_series
     )
 
 if __name__ == '__main__':
