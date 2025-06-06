@@ -40,7 +40,6 @@
       background-color: #3b3b3b;
       padding: 8px 12px;
       font-size: 0.95rem;
-      list-style: none;
       cursor: pointer;
       border-radius: 4px;
     }
@@ -67,8 +66,24 @@
       border-radius: 3px;
     }
     details > div input[type="checkbox"] {
-      margin-right: 8px;
-      transform: scale(1.1);
+      /* Taille et espacement */
+      width: 16px;
+      height: 16px;
+      margin-right: 10px;
+      /* Couleur de l’accent (case cochée) */
+      accent-color: #4a90e2;
+      /* Bordure fine et arrondie */
+      border: 2px solid #666;
+      border-radius: 4px;
+      /* Curseur et ombre légère */
+      cursor: pointer;
+      box-shadow: 0 0 2px rgba(0,0,0,0.5);
+      /* Suppression du transform superposé */
+      transform: none;
+    }
+    details > div input[type="checkbox"]:checked {
+      /* Ajuste la bordure lorsque cochée */
+      border-color: #4a90e2;
     }
     details > div label {
       font-size: 0.9rem;
@@ -132,6 +147,30 @@
     #lightbox-overlay.visible img {
       transform: scale(1);
     }
+    /* Pagination links styling */
+    .pagination-container .page-link, 
+    .pagination-container .page-link:link, 
+    .pagination-container .page-link:visited {
+      background-color: #444;
+      color: #f0f0f0;
+      text-decoration: none;
+      padding: 6px 10px;
+      border-radius: 4px;
+      margin: 0 4px;
+      font-size: 0.9rem;
+    }
+    .pagination-container .page-link:hover {
+      background-color: #666;
+    }
+    .pagination-container .page-link.current {
+      background-color: #888;
+      cursor: default;
+    }
+    .pagination-container .page-link.disabled {
+      background-color: #222;
+      color: #666;
+      cursor: not-allowed;
+    }
   </style>
 </head>
 <body>
@@ -139,9 +178,12 @@
     <div class="container">
       <div class="filtres">
         <details>
-          <summary>ERAS</summary>
+          <summary>
+            <input type="checkbox" id="select_all_eras">
+            ERAS
+          </summary>
           <div style="max-height:200px; overflow-y:auto; margin-left:10px; margin-top:5px;">
-            {% for era in eras|sort %}
+            {% for era in eras %}
               <div>
                 <input type="checkbox" name="era" value="{{ era }}"
                   {% if era in selected_eras %}checked{% endif %}
@@ -153,10 +195,20 @@
         </details>
 
         <details style="margin-top:10px;">
-          <summary>SERIES</summary>
+          <summary>
+            <input type="checkbox" id="select_all_series">
+            SERIES
+          </summary>
           <div style="max-height:200px; overflow-y:auto; margin-left:10px; margin-top:5px;">
             {% for s in series %}
-              {% if not selected_eras or s in allowed_series %}
+              {% if not selected_eras %}
+                <div>
+                  <input type="checkbox" name="series" value="{{ s }}"
+                    {% if s in selected_series %}checked{% endif %}
+                    onchange="document.getElementById('form-filtres').submit()">
+                  <label>{{ s }}</label>
+                </div>
+              {% elif s in allowed_series %}
                 <div>
                   <input type="checkbox" name="series" value="{{ s }}"
                     {% if s in selected_series %}checked{% endif %}
@@ -169,17 +221,18 @@
         </details>
 
         <details style="margin-top:10px;">
-          <summary>DECKS</summary>
+          <summary>
+            <input type="checkbox" id="select_all_decks">
+            DECKS
+          </summary>
           <div style="max-height:200px; overflow-y:auto; margin-left:10px; margin-top:5px;">
             {% for d in decks %}
-              {% if not selected_eras or d in allowed_series %}
-                <div>
-                  <input type="checkbox" name="deck" value="{{ d }}"
-                    {% if d in selected_decks %}checked{% endif %}
-                    onchange="document.getElementById('form-filtres').submit()">
-                  <label>{{ d }}</label>
-                </div>
-              {% endif %}
+              <div>
+                <input type="checkbox" name="deck" value="{{ d }}"
+                  {% if d in selected_decks %}checked{% endif %}
+                  onchange="document.getElementById('form-filtres').submit()">
+                <label>{{ d }}</label>
+              </div>
             {% endfor %}
           </div>
         </details>
@@ -216,131 +269,96 @@
             </div>
           {% endif %}
         {% endfor %}
-        {# Déterminer individuellement quelles options afficher #}
-        {% set show_no_alternative = ("V" in selected_types) or ("VMAX" in selected_types) or ("VSTAR" in selected_types) %}
-        {% set show_no_characters = ("V" in selected_types) or ("VMAX" in selected_types) %}
-        {% set show_no_fullart = "V" in selected_types %}
-        {% set show_no_gold = ("V" in selected_types) or ("VMAX" in selected_types) or ("VSTAR" in selected_types) or ("FULL ART" in selected_styles) %}
-        {% set show_no_holo_shiny = ("S" in selected_rarities) or ("SHINY" in selected_styles) %}
-        {% set show_no_k_shiny = ("K" in selected_rarities) or ("SHINY" in selected_styles) %}
-        {% set show_no_rainbow = ("VMAX" in selected_types) or ("VSTAR" in selected_types) %}
-        {% set show_no_shiny = ("V" in selected_types) or ("VMAX" in selected_types) or ("FULL ART" in selected_styles) %}
-        {% set show_no_trainers = "FULL ART" in selected_styles %}
-        {% set show_no_v_shiny = "V" in selected_types %}
-        {% set show_no_vmax_shiny = "VMAX" in selected_types %}
-
-        {% if ("GOLD" in selected_styles) or show_no_alternative or show_no_characters or show_no_fullart or show_no_gold or show_no_holo_shiny or show_no_k_shiny or show_no_rainbow or show_no_shiny or show_no_trainers or show_no_v_shiny or show_no_vmax_shiny %}
-          <h3>OPTIONS SUPPLÉMENTAIRES</h3>
-          {% if "GOLD" in selected_styles %}
-            {% set gold_subs = ["ALTERNATIVE", "BASE", "BLACK GOLD", "GOLD METAL", "POKEMON"] %}
-            {% for sub in gold_subs %}
-              <div>
-                <input type="checkbox" name="sub_{{ sub }}" value="{{ sub }}"
-                  {% if selected_substyles.get("GOLD") and sub in selected_substyles["GOLD"] %}checked{% endif %}
-                  onchange="document.getElementById('form-filtres').submit()">
-                <label>{{ sub }}</label>
-              </div>
-            {% endfor %}
-          {% endif %}
-          {% if show_no_alternative %}
+        {% if selected_styles or selected_types or selected_rarities %}
+        <h3>OPTIONS SUPPLÉMENTAIRES</h3>
+        {# Liste des options positives en ordre alphabétique #}
+        {% set positive_options = [
+          ("ALTERNATIVES", "opt_alternative"),
+          ("ALTERNATIVES GOLD", "opt_alternative_gold"),
+          ("BLACK GOLD", "opt_blackgold"),
+          ("BORDER GOLD", "opt_bordergold"),
+          ("CHARACTERS RARES", "characters"),
+          ("FULL ART", "opt_fullart"),
+          ("GOLD", "opt_gold"),
+          ("GOLD METAL", "opt_gold_metal"),
+          ("MEGA-PRIMO", "opt_megaprimo"),
+          ("METAL", "opt_metal"),
+          ("RAINBOW", "opt_rainbow"),
+          ("SHINY", "opt_shiny"),
+          ("TRAINERS", "opt_trainers")
+        ] %}
+        <div style="margin-left:10px; margin-top:5px;">
+          {% for label, name in positive_options %}
             <div>
-              <input type="checkbox" name="no_alternative" value="1"
-                {% if request.args.get('no_alternative') %}checked{% endif %}
+              <input type="checkbox" name="{{ name }}" value="1"
+                {% if request.args.get(name) %}checked{% endif %}
                 onchange="document.getElementById('form-filtres').submit()">
-              <label>NO ALTERNATIVE</label>
+              <label>{{ label }}</label>
             </div>
-          {% endif %}
-          {% if show_no_characters %}
+          {% endfor %}
+          <hr style="border:1px solid #444; margin:10px 0;">
+        {# Liste des options négatives en ordre alphabétique #}
+        {% set negative_options = [
+          ("NO ALTERNATIVES", "no_alternative"),
+          ("NO ALTERNATIVES GOLD", "no_alternative_gold"),
+          ("NO BLACK GOLD", "no_blackgold"),
+          ("NO BORDER GOLD", "no_border_gold"),
+          ("NO CHARACTERS RARES", "no_characters"),
+          ("NO FULL ART", "no_fullart"),
+          ("NO GOLD", "no_gold"),
+          ("NO GOLD METAL", "no_gold_metal"),
+          ("NO MEGA-PRIMO", "no_mega_primo"),
+          ("NO METAL", "no_metal"),
+          ("NO RAINBOW", "no_rainbow"),
+          ("NO SHINY", "no_shiny"),
+          ("NO TRAINERS", "no_trainers")
+        ] %}
+          {% for label, name in negative_options %}
             <div>
-              <input type="checkbox" name="no_characters" value="1"
-                {% if request.args.get('no_characters') %}checked{% endif %}
+              <input type="checkbox" name="{{ name }}" value="1"
+                {% if request.args.get(name) %}checked{% endif %}
                 onchange="document.getElementById('form-filtres').submit()">
-              <label>NO CHARACTERS RARES</label>
+              <label>{{ label }}</label>
             </div>
-          {% endif %}
-          {% if show_no_fullart %}
-            <div>
-              <input type="checkbox" name="no_fullart" value="1"
-                {% if request.args.get('no_fullart') %}checked{% endif %}
-                onchange="document.getElementById('form-filtres').submit()">
-              <label>NO FULL ART</label>
-            </div>
-          {% endif %}
-          {% if show_no_gold %}
-            <div>
-              <input type="checkbox" name="no_gold" value="1"
-                {% if request.args.get('no_gold') %}checked{% endif %}
-                onchange="document.getElementById('form-filtres').submit()">
-              <label>NO GOLD</label>
-            </div>
-          {% endif %}
-          {% if show_no_holo_shiny %}
-            <div>
-              <input type="checkbox" name="no_holo_shiny" value="1"
-                {% if request.args.get('no_holo_shiny') %}checked{% endif %}
-                onchange="document.getElementById('form-filtres').submit()">
-              <label>NO HOLO SHINY</label>
-            </div>
-          {% endif %}
-          {% if show_no_k_shiny %}
-            <div>
-              <input type="checkbox" name="no_k_shiny" value="1"
-                {% if request.args.get('no_k_shiny') %}checked{% endif %}
-                onchange="document.getElementById('form-filtres').submit()">
-              <label>NO K SHINY</label>
-            </div>
-          {% endif %}
-          {% if show_no_rainbow %}
-            <div>
-              <input type="checkbox" name="no_rainbow" value="1"
-                {% if request.args.get('no_rainbow') %}checked{% endif %}
-                onchange="document.getElementById('form-filtres').submit()">
-              <label>NO RAINBOW</label>
-            </div>
-          {% endif %}
-          {% if show_no_shiny %}
-            <div>
-              <input type="checkbox" name="no_shiny" value="1"
-                {% if request.args.get('no_shiny') %}checked{% endif %}
-                onchange="document.getElementById('form-filtres').submit()">
-              <label>NO SHINY</label>
-            </div>
-          {% endif %}
-          {% if show_no_v_shiny %}
-            <div>
-              <input type="checkbox" name="no_v_shiny" value="1"
-                {% if request.args.get('no_v_shiny') %}checked{% endif %}
-                onchange="document.getElementById('form-filtres').submit()">
-              <label>NO V SHINY</label>
-            </div>
-          {% endif %}
-          {% if show_no_vmax_shiny %}
-            <div>
-              <input type="checkbox" name="no_vmax_shiny" value="1"
-                {% if request.args.get('no_vmax_shiny') %}checked{% endif %}
-                onchange="document.getElementById('form-filtres').submit()">
-              <label>NO VMAX SHINY</label>
-            </div>
-          {% endif %}
-          {% if show_no_trainers %}
-            <div>
-              <input type="checkbox" name="no_trainers" value="1"
-                {% if request.args.get('no_trainers') %}checked{% endif %}
-                onchange="document.getElementById('form-filtres').submit()">
-              <label>NO TRAINERS</label>
-            </div>
-          {% endif %}
+          {% endfor %}
+        </div>
         {% endif %}
         <!-- Le bouton Filtrer a été retiré : soumission automatique à chaque changement -->
       </div>
       <div class="grille">
-        <h4>{{ cartes|length }} cartes trouvées</h4>
-        <div>
+        <h4>{{ total_cards }} cartes trouvées au total</h4>
+        <div id="cards-container">
           {% for chemin in cartes %}
             <div class="carte">
               <img class="miniature" src="{{ url_for('static', filename=chemin) }}" alt="{{ chemin }}">
             </div>
           {% endfor %}
+        </div>
+
+        {# Pagination #}
+        <div class="pagination-container" style="display: flex; justify-content: center; margin-top: 20px;">
+          {# Lien 'Précédent' #}
+          {% if current_page > 1 %}
+            <a href="?{% for key, vals in request.args.lists() if key != 'page' %}{% for v in vals %}{{ key }}={{ v }}&{% endfor %}{% endfor %}page={{ current_page - 1 }}" class="page-link">&laquo; Précédent</a>
+          {% else %}
+            <span class="page-link disabled">&laquo; Précédent</span>
+          {% endif %}
+
+          {# Numéros de pages #}
+          {% for p in range(1, total_pages + 1) %}
+            {% if p == current_page %}
+              <span class="page-link current">{{ p }}</span>
+            {% else %}
+              <a href="?{% for key, vals in request.args.lists() if key != 'page' %}{% for v in vals %}{{ key }}={{ v }}&{% endfor %}{% endfor %}page={{ p }}" class="page-link">{{ p }}</a>
+            {% endif %}
+          {% endfor %}
+
+          {# Lien 'Suivant' #}
+          {% if current_page < total_pages %}
+            <a href="?{% for key, vals in request.args.lists() if key != 'page' %}{% for v in vals %}{{ key }}={{ v }}&{% endfor %}{% endfor %}page={{ current_page + 1 }}" class="page-link">Suivant &raquo;</a>
+          {% else %}
+            <span class="page-link disabled">Suivant &raquo;</span>
+          {% endif %}
         </div>
       </div>
     </div>
@@ -379,32 +397,151 @@
       // GOLD
       var goldCheckbox = Array.from(document.querySelectorAll('input[name="style"]')).find(cb => cb.value === 'GOLD');
       var subGold = document.getElementById('sub-GOLD');
-      if (goldCheckbox && goldCheckbox.checked) {
+      if (goldCheckbox && subGold && goldCheckbox.checked) {
         subGold.style.display = 'block';
-      } else {
+      } else if (subGold) {
         subGold.style.display = 'none';
       }
       // FULL ART
       var faCheckbox = Array.from(document.querySelectorAll('input[name="style"]')).find(cb => cb.value === 'FULL ART');
       var subFull = document.getElementById('sub-FULL_ART');
-      if (faCheckbox && faCheckbox.checked) {
+      if (faCheckbox && subFull && faCheckbox.checked) {
         subFull.style.display = 'block';
-      } else {
+      } else if (subFull) {
         subFull.style.display = 'none';
+      }
+      // Sélecteur pour ERAS
+      var selectAllEras = document.getElementById('select_all_eras');
+      if (selectAllEras) {
+        selectAllEras.addEventListener('change', function() {
+          var eraCheckboxes = document.querySelectorAll('input[name="era"]');
+          eraCheckboxes.forEach(function(cb) { cb.checked = selectAllEras.checked; });
+          document.getElementById('form-filtres').submit();
+        });
+        // Synchroniser l'état du select_all_eras au chargement
+        var eraCheckboxes = document.querySelectorAll('input[name="era"]');
+        if (eraCheckboxes.length > 0) {
+          var allChecked = Array.from(eraCheckboxes).every(cb => cb.checked);
+          selectAllEras.checked = allChecked;
+        }
+        // Synchroniser si une case individuelle change (pour décocher "tout sélectionner" si besoin)
+        eraCheckboxes.forEach(function(cb) {
+          cb.addEventListener('change', function() {
+            var allChecked = Array.from(eraCheckboxes).every(c => c.checked);
+            selectAllEras.checked = allChecked;
+          });
+        });
+      }
+
+      // --- GÉRER TOUT SÉLECTIONNER POUR SERIES ---
+      var selectAllSeries = document.getElementById('select_all_series');
+      if (selectAllSeries) {
+        selectAllSeries.addEventListener('change', function() {
+          var seriesBoxes = document.querySelectorAll('input[name="series"]');
+          seriesBoxes.forEach(function(cb) { cb.checked = selectAllSeries.checked; });
+          document.getElementById('form-filtres').submit();
+        });
+        // Synchroniser l'état de select_all_series au chargement
+        var seriesBoxes = document.querySelectorAll('input[name="series"]');
+        if (seriesBoxes.length > 0) {
+          selectAllSeries.checked = Array.from(seriesBoxes).every(cb => cb.checked);
+        }
+        seriesBoxes.forEach(function(cb) {
+          cb.addEventListener('change', function() {
+            selectAllSeries.checked = Array.from(seriesBoxes).every(c => c.checked);
+          });
+        });
+      }
+
+      // --- GÉRER TOUT SÉLECTIONNER POUR DECKS ---
+      var selectAllDecks = document.getElementById('select_all_decks');
+      if (selectAllDecks) {
+        selectAllDecks.addEventListener('change', function() {
+          var deckBoxes = document.querySelectorAll('input[name="deck"]');
+          deckBoxes.forEach(function(cb) { cb.checked = selectAllDecks.checked; });
+          document.getElementById('form-filtres').submit();
+        });
+        // Synchroniser l'état de select_all_decks au chargement
+        var deckBoxes = document.querySelectorAll('input[name="deck"]');
+        if (deckBoxes.length > 0) {
+          selectAllDecks.checked = Array.from(deckBoxes).every(cb => cb.checked);
+        }
+        deckBoxes.forEach(function(cb) {
+          cb.addEventListener('change', function() {
+            selectAllDecks.checked = Array.from(deckBoxes).every(c => c.checked);
+          });
+        });
       }
     });
 
     // Avant la soumission, on met à jour le champ caché "substyles"
     document.getElementById('form-filtres').addEventListener('submit', function(e) {
       let subChecked = [];
-      document.querySelectorAll('#sub-GOLD input[type=checkbox]').forEach(i => {
-        if (i.checked) subChecked.push(i.value);
-      });
+      var subGold = document.getElementById('sub-GOLD');
+      if (subGold) {
+        subGold.querySelectorAll('input[type=checkbox]').forEach(i => {
+          if (i.checked) subChecked.push(i.value);
+        });
+      }
       let hidden = document.getElementById('hidden_substyles');
       if (subChecked.length > 0) {
         hidden.value = 'GOLD:' + subChecked.join(',');
       } else {
         hidden.value = '';
+      }
+    });
+  </script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // MEGA-PRIMO vs NO MEGA-PRIMO (Style vs Option négative)
+      var styleMega = document.querySelector('input[name="style"][value="MEGA-PRIMO"]');
+      var noMega = document.querySelector('input[name="no_mega_primo"]');
+      if (styleMega && noMega) {
+        styleMega.addEventListener('change', function() { if (styleMega.checked) noMega.checked = false; });
+        noMega.addEventListener('change', function() { if (noMega.checked) styleMega.checked = false; });
+      }
+      // OPTION MEGA-PRIMO vs STYLE MEGA-PRIMO (Option vs Style)
+      var optMega = document.querySelector('input[name="opt_megaprimo"]');
+      if (optMega && styleMega) {
+        optMega.addEventListener('change', function() { if (optMega.checked) styleMega.checked = false; });
+        styleMega.addEventListener('change', function() { if (styleMega.checked) optMega.checked = false; });
+      }
+      // FULL ART vs NO FULL ART (Style vs Option négative)
+      var styleFA = document.querySelector('input[name="style"][value="FULL ART"]');
+      var noFA = document.querySelector('input[name="no_fullart"]');
+      if (styleFA && noFA) {
+        styleFA.addEventListener('change', function() {
+          if (styleFA.checked) {
+            noFA.checked = false;
+            document.getElementById('form-filtres').submit();
+          }
+        });
+        noFA.addEventListener('change', function() {
+          if (noFA.checked) {
+            styleFA.checked = false;
+            document.getElementById('form-filtres').submit();
+          }
+        });
+      }
+      // OPTION FULL ART vs STYLE FULL ART (Option vs Style)
+      var optFA = document.querySelector('input[name="opt_fullart"]');
+      if (optFA && styleFA) {
+        optFA.addEventListener('change', function() { if (optFA.checked) styleFA.checked = false; });
+        styleFA.addEventListener('change', function() { if (styleFA.checked) optFA.checked = false; });
+      }
+      // BORDER GOLD vs NO BORDER GOLD (Style vs Option négative)
+      var styleBG = document.querySelector('input[name="style"][value="BORDER GOLD"]');
+      var noBG = document.querySelector('input[name="no_border_gold"]');
+      if (styleBG && noBG) {
+        styleBG.addEventListener('change', function() { if (styleBG.checked) noBG.checked = false; });
+        noBG.addEventListener('change', function() { if (noBG.checked) styleBG.checked = false; });
+      }
+      // OPTION BORDER GOLD vs STYLE BORDER GOLD (Option vs Style)
+      var optBG = document.querySelector('input[name="opt_bordergold"]');
+      if (optBG && styleBG) {
+        optBG.addEventListener('change', function() { if (optBG.checked) styleBG.checked = false; });
+        styleBG.addEventListener('change', function() { if (styleBG.checked) optBG.checked = false; });
       }
     });
   </script>

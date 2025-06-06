@@ -1,53 +1,62 @@
 
 
-import os
+#!/usr/bin/env python3
+"""
+Script pour renommer les images dans static/cards/XY en ajoutant le chemin des dossiers
+parents comme suffixe au nom de fichier.
 
-def rename_decks(base_dir):
+Exemple :
+  Avant : static/cards/XY/PROMO/EX_MEGA-PRIMO/XYP_079.jpeg
+  Après  : static/cards/XY/PROMO/EX_MEGA-PRIMO/XYP_079_PROMO_EX_MEGA-PRIMO.jpeg
+"""
+
+import os
+import sys
+
+def rename_xy_images(xy_root="static/cards/XY"):
     """
-    Parcourt les sous-dossiers de 'DECK' et renomme chaque fichier selon la logique :
-    - Le dernier segment avant l'extension est le numéro.
-    - Le segment juste avant le numéro est le code de la série.
-    - Tout ce qui précède ces deux éléments constitue le reste (type + éventuel sous-type).
-    Nouveau format : {serie}_{num}_{reste}.ext
-    Exemple : 'DECK_EX_PCG_CDCH_011.jpeg' -> 'CDCH_011_DECK_EX_PCG.jpeg'
+    Parcourt récursivement le dossier xy_root et renomme chaque fichier image en
+    ajoutant le chemin relatif (depuis xy_root) comme suffixe au nom principal.
     """
-    deck_dir = os.path.join(base_dir, "DECK")
-    if not os.path.isdir(deck_dir):
-        print(f"Le dossier {deck_dir} n'existe pas.")
+    if not os.path.isdir(xy_root):
+        print(f"Le dossier '{xy_root}' n'existe pas.")
         return
 
-    for subfolder in os.listdir(deck_dir):
-        subfolder_path = os.path.join(deck_dir, subfolder)
-        if not os.path.isdir(subfolder_path):
+    for root, dirs, files in os.walk(xy_root):
+        # Ignorer le dossier racine lui-même
+        rel_dir = os.path.relpath(root, xy_root)
+        if rel_dir == ".":
             continue
 
-        for filename in os.listdir(subfolder_path):
-            file_path = os.path.join(subfolder_path, filename)
-            if not os.path.isfile(file_path):
+        # Construire la partie suffixe : on prend le chemin relatif, on remplace les séparateurs par underscore
+        # Exemple : rel_dir = "PROMO/EX_MEGA-PRIMO" -> suffix = "PROMO_EX_MEGA-PRIMO"
+        suffix = rel_dir.replace(os.sep, "_")
+
+        for filename in files:
+            # Cibler uniquement les fichiers image (jpg, jpeg, png, webp, etc.)
+            if not filename.lower().endswith(('.jpg', '.jpeg', '.png', '.webp')):
                 continue
 
+            old_path = os.path.join(root, filename)
             name, ext = os.path.splitext(filename)
-            parts = name.split("_")
-            # On doit avoir au moins 3 segments : reste, série, numéro
-            if len(parts) < 3:
-                print(f"Ignoré (format inattendu) : {filename}")
+
+            # Si le nom contient déjà le suffixe, on saute
+            if name.endswith(f"_{suffix}"):
                 continue
 
-            num = parts[-1]       # dernier segment
-            serie = parts[-2]     # avant-dernier segment
-            reste = "_".join(parts[:-2])  # tout ce qui précède
+            new_name = f"{name}_{suffix}{ext}"
+            new_path = os.path.join(root, new_name)
 
-            new_name = f"{serie}_{num}_{reste}{ext.lower()}"
-            new_path = os.path.join(subfolder_path, new_name)
-
-            if os.path.exists(new_path):
-                print(f"Le fichier {new_name} existe déjà, on le saute.")
-                continue
-
-            os.rename(file_path, new_path)
-            print(f"Deck: {filename} -> {new_name}")
+            try:
+                os.rename(old_path, new_path)
+                print(f"Renommé : {old_path} → {new_path}")
+            except Exception as e:
+                print(f"Erreur lors du renommage de {old_path} : {e}")
 
 if __name__ == "__main__":
-    base_directory = os.path.join(os.getcwd(), "static", "cards", "S&S")
-    print(f"Debug: base_directory = {base_directory}")
-    rename_decks(base_directory)
+    # Autoriser un argument en ligne de commande pour spécifier le dossier XY
+    if len(sys.argv) > 1:
+        root_dir = sys.argv[1]
+    else:
+        root_dir = "static/cards/XY"
+    rename_xy_images(root_dir)
