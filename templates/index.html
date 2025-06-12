@@ -3,178 +3,56 @@
 <head>
   <meta charset="UTF-8">
   <title>Recherche de cartes Pokémon</title>
-  <style>
-    body {
-      background-color: #1e1e1e;
-      color: #f0f0f0;
-      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-      margin: 0;
-      padding: 0;
-    }
-    .container {
-      display: flex;
-    }
-    .filtres {
-      flex: 0 0 300px;
-      padding: 15px;
-      background-color: #2a2a2a;
-      height: 100vh;
-      overflow-y: auto;
-      box-shadow: 2px 0 5px rgba(0, 0, 0, 0.5);
-    }
-    .filtres h3 {
-      margin-top: 20px;
-      margin-bottom: 10px;
-      font-size: 1rem;
-      border-bottom: 1px solid #444;
-      padding-bottom: 5px;
-    }
-    details {
-      margin-bottom: 15px;
-      border: 1px solid #444;
-      border-radius: 4px;
-      background-color: #303030;
-      overflow: hidden;
-    }
-    details > summary {
-      background-color: #3b3b3b;
-      padding: 8px 12px;
-      font-size: 0.95rem;
-      cursor: pointer;
-      border-radius: 4px;
-    }
-    details[open] > summary {
-      background-color: #4a90e2;
-      color: #ffffff;
-    }
-    details > div {
-      background-color: #333;
-      max-height: 200px;
-      overflow-y: auto;
-      padding: 8px 12px;
-    }
-    /* Custom scrollbar for filter lists */
-    details > div::-webkit-scrollbar {
-      width: 6px;
-    }
-    details > div::-webkit-scrollbar-track {
-      background: #2a2a2a;
-      border-radius: 3px;
-    }
-    details > div::-webkit-scrollbar-thumb {
-      background-color: #4a90e2;
-      border-radius: 3px;
-    }
-    details > div input[type="checkbox"] {
-      /* Taille et espacement */
-      width: 16px;
-      height: 16px;
-      margin-right: 10px;
-      /* Couleur de l’accent (case cochée) */
-      accent-color: #4a90e2;
-      /* Bordure fine et arrondie */
-      border: 2px solid #666;
-      border-radius: 4px;
-      /* Curseur et ombre légère */
-      cursor: pointer;
-      box-shadow: 0 0 2px rgba(0,0,0,0.5);
-      /* Suppression du transform superposé */
-      transform: none;
-    }
-    details > div input[type="checkbox"]:checked {
-      /* Ajuste la bordure lorsque cochée */
-      border-color: #4a90e2;
-    }
-    details > div label {
-      font-size: 0.9rem;
-    }
-    .grille {
-      flex: 1;
-      padding: 15px;
-      overflow-y: auto;
-      height: 100vh;
-      background-color: #1f1f1f;
-    }
-    .grille h4 {
-      margin-top: 0;
-      margin-bottom: 15px;
-      font-size: 1.1rem;
-    }
-    .grille div {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-      grid-gap: 12px;
-    }
-    .carte {
-      position: relative;
-    }
-    .carte img {
-      width: 100%;
-      height: auto;
-      border: 2px solid #444;
-      border-radius: 6px;
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
-    }
-    .carte img:hover {
-      transform: scale(1.05);
-      box-shadow: 0 0 15px rgba(74, 144, 226, 0.7);
-      cursor: pointer;
-    }
-    /* Lightbox backdrop (overlay) */
-    #lightbox-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      background-color: rgba(0, 0, 0, 0.85);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      z-index: 999;
-    }
-    #lightbox-overlay img {
-      max-width: 90vw;
-      max-height: 90vh;
-      box-shadow: 0 0 30px rgba(0, 0, 0, 0.7);
-      border-radius: 8px;
-      transform: scale(0.8);
-      transition: transform 0.3s ease;
-    }
-    #lightbox-overlay.visible {
-      display: flex;
-    }
-    #lightbox-overlay.visible img {
-      transform: scale(1);
-    }
-    /* Pagination links styling */
-    .pagination-container .page-link, 
-    .pagination-container .page-link:link, 
-    .pagination-container .page-link:visited {
-      background-color: #444;
-      color: #f0f0f0;
-      text-decoration: none;
-      padding: 6px 10px;
-      border-radius: 4px;
-      margin: 0 4px;
-      font-size: 0.9rem;
-    }
-    .pagination-container .page-link:hover {
-      background-color: #666;
-    }
-    .pagination-container .page-link.current {
-      background-color: #888;
-      cursor: default;
-    }
-    .pagination-container .page-link.disabled {
-      background-color: #222;
-      color: #666;
-      cursor: not-allowed;
-    }
-  </style>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
   <form id="form-filtres" method="get" action="/">
+    <!-- BARRE DE RECHERCHE CENTRÉE EN HAUT -->
+    <div style="width:100%; display:flex; justify-content:center; align-items:center; margin: 30px 0 20px 0;">
+      <div style="position:relative; width:350px; display:flex;">
+        <input id="search-bar" type="text" name="search" autocomplete="off" placeholder="Rechercher un Pokémon ou un Trainer..." value="{{ search_query|default('') }}" style="flex:1 1 auto; padding: 10px 14px; border-radius: 6px 0 0 6px; border: 1px solid #888; font-size: 1.1rem; outline:none; background: #fff; color: #222; height:44px; box-sizing:border-box;">
+        <button type="submit" style="padding: 0 22px; border-radius: 0 6px 6px 0; background: #4a90e2; color: #fff; border: none; font-size: 1.1rem; cursor: pointer; height:44px; box-sizing:border-box; display:flex; align-items:center;">🔍</button>
+        <ul id="autocomplete-list" style="position:absolute; top:100%; left:0; right:0; z-index:10; background:white; border:1px solid #4a90e2; border-top:none; list-style:none; margin:0; padding:0; max-height:220px; overflow-y:auto; display:none; box-shadow:0 4px 16px rgba(0,0,0,0.08); border-radius:0 0 8px 8px;"></ul>
+      </div>
+    </div>
+    <script>
+      const searchBar = document.getElementById('search-bar');
+      const list = document.getElementById('autocomplete-list');
+      searchBar.addEventListener('input', function() {
+        const val = this.value.trim();
+        if(val.length < 1) { list.style.display = 'none'; list.innerHTML = ''; return; }
+        fetch(`/autocomplete?q=${encodeURIComponent(val)}`)
+          .then(r => r.json())
+          .then(data => {
+            list.innerHTML = '';
+            if(data.length === 0) { list.style.display = 'none'; return; }
+            data.forEach(s => {
+              const li = document.createElement('li');
+              li.textContent = s;
+              li.style.padding = '10px 16px';
+              li.style.cursor = 'pointer';
+              li.style.color = '#222';
+              li.style.background = '#fff';
+              li.style.fontSize = '1.05rem';
+              li.style.transition = 'background 0.15s';
+              li.addEventListener('mouseenter', function() { li.style.background = '#eaf3fc'; });
+              li.addEventListener('mouseleave', function() { li.style.background = '#fff'; });
+              li.addEventListener('mousedown', function(e) {
+                searchBar.value = s;
+                list.style.display = 'none';
+                document.getElementById('form-filtres').submit();
+              });
+              list.appendChild(li);
+            });
+            list.style.display = 'block';
+          });
+      });
+      document.addEventListener('click', function(e) {
+        if(!list.contains(e.target) && e.target !== searchBar) {
+          list.style.display = 'none';
+        }
+      });
+    </script>
     <div class="container">
       <div class="filtres">
         <details>
@@ -248,9 +126,9 @@
         {% endfor %}
         <h3>TYPE DE CARTE</h3>
         {% for t in types|sort %}
-          {% if not t.endswith('-BASE') %}
+          {% if not t.endswith('-BASE') and t != 'CHARACTERS RARES' %}
             <div>
-              <input type="checkbox" name="type" value="{{ t }}"
+              <input type="checkbox" name="type" value="{{ t|upper }}"
                 {% if t in selected_types %}checked{% endif %}
                 onchange="document.getElementById('form-filtres').submit()">
               <label>{{ t }}</label>
@@ -261,7 +139,7 @@
         {% for s in styles|sort %}
           {% if s != "BASE" %}
             <div>
-              <input type="checkbox" name="style" value="{{ s }}"
+              <input type="checkbox" name="style" value="{{ s|upper }}"
                 {% if s in selected_styles %}checked{% endif %}
                 onclick="toggleSubstyles(this)"
                 onchange="document.getElementById('form-filtres').submit()">
@@ -277,14 +155,16 @@
           ("ALTERNATIVES GOLD", "opt_alternative_gold"),
           ("BLACK GOLD", "opt_blackgold"),
           ("BORDER GOLD", "opt_bordergold"),
-          ("CHARACTERS RARES", "characters"),
+          ("CHARACTERS RARES", "opt_characters"),
           ("FULL ART", "opt_fullart"),
           ("GOLD", "opt_gold"),
           ("GOLD METAL", "opt_gold_metal"),
           ("MEGA-PRIMO", "opt_megaprimo"),
           ("METAL", "opt_metal"),
+          ("PLASMA", "opt_plasma"),
           ("RAINBOW", "opt_rainbow"),
           ("SHINY", "opt_shiny"),
+          ("TAG TEAM", "opt_tagteam"),
           ("TRAINERS", "opt_trainers")
         ] %}
         <div style="margin-left:10px; margin-top:5px;">
@@ -309,8 +189,10 @@
           ("NO GOLD METAL", "no_gold_metal"),
           ("NO MEGA-PRIMO", "no_mega_primo"),
           ("NO METAL", "no_metal"),
+          ("NO PLASMA", "no_plasma"),
           ("NO RAINBOW", "no_rainbow"),
           ("NO SHINY", "no_shiny"),
+          ("NO TAG TEAM", "no_tagteam"),
           ("NO TRAINERS", "no_trainers")
         ] %}
           {% for label, name in negative_options %}
@@ -367,210 +249,6 @@
       value="{% if selected_substyles %}GOLD:{{ selected_substyles|join(',') }}{% endif %}">
   </form>
 
-  <script>
-    // Affiche/masque les sous-catégories pour "Gold" et "FULL ART"
-    function toggleSubstyles(cb) {
-      // Existing GOLD handling
-      if (cb.value === 'GOLD') {
-        let subDiv = document.getElementById('sub-GOLD');
-        if (cb.checked) {
-          subDiv.style.display = 'block';
-        } else {
-          subDiv.querySelectorAll('input[type=checkbox]').forEach(i => i.checked = false);
-          subDiv.style.display = 'none';
-        }
-      }
-      // Add FULL ART handling
-      if (cb.value === 'FULL ART') {
-        let subFull = document.getElementById('sub-FULL_ART');
-        if (cb.checked) {
-          subFull.style.display = 'block';
-        } else {
-          subFull.querySelectorAll('input[type=checkbox]').forEach(i => i.checked = false);
-          subFull.style.display = 'none';
-        }
-      }
-    }
-
-    // Affiche le sous-style GOLD et FULL ART si déjà sélectionné au chargement
-    document.addEventListener('DOMContentLoaded', function() {
-      // GOLD
-      var goldCheckbox = Array.from(document.querySelectorAll('input[name="style"]')).find(cb => cb.value === 'GOLD');
-      var subGold = document.getElementById('sub-GOLD');
-      if (goldCheckbox && subGold && goldCheckbox.checked) {
-        subGold.style.display = 'block';
-      } else if (subGold) {
-        subGold.style.display = 'none';
-      }
-      // FULL ART
-      var faCheckbox = Array.from(document.querySelectorAll('input[name="style"]')).find(cb => cb.value === 'FULL ART');
-      var subFull = document.getElementById('sub-FULL_ART');
-      if (faCheckbox && subFull && faCheckbox.checked) {
-        subFull.style.display = 'block';
-      } else if (subFull) {
-        subFull.style.display = 'none';
-      }
-      // Sélecteur pour ERAS
-      var selectAllEras = document.getElementById('select_all_eras');
-      if (selectAllEras) {
-        selectAllEras.addEventListener('change', function() {
-          var eraCheckboxes = document.querySelectorAll('input[name="era"]');
-          eraCheckboxes.forEach(function(cb) { cb.checked = selectAllEras.checked; });
-          document.getElementById('form-filtres').submit();
-        });
-        // Synchroniser l'état du select_all_eras au chargement
-        var eraCheckboxes = document.querySelectorAll('input[name="era"]');
-        if (eraCheckboxes.length > 0) {
-          var allChecked = Array.from(eraCheckboxes).every(cb => cb.checked);
-          selectAllEras.checked = allChecked;
-        }
-        // Synchroniser si une case individuelle change (pour décocher "tout sélectionner" si besoin)
-        eraCheckboxes.forEach(function(cb) {
-          cb.addEventListener('change', function() {
-            var allChecked = Array.from(eraCheckboxes).every(c => c.checked);
-            selectAllEras.checked = allChecked;
-          });
-        });
-      }
-
-      // --- GÉRER TOUT SÉLECTIONNER POUR SERIES ---
-      var selectAllSeries = document.getElementById('select_all_series');
-      if (selectAllSeries) {
-        selectAllSeries.addEventListener('change', function() {
-          var seriesBoxes = document.querySelectorAll('input[name="series"]');
-          seriesBoxes.forEach(function(cb) { cb.checked = selectAllSeries.checked; });
-          document.getElementById('form-filtres').submit();
-        });
-        // Synchroniser l'état de select_all_series au chargement
-        var seriesBoxes = document.querySelectorAll('input[name="series"]');
-        if (seriesBoxes.length > 0) {
-          selectAllSeries.checked = Array.from(seriesBoxes).every(cb => cb.checked);
-        }
-        seriesBoxes.forEach(function(cb) {
-          cb.addEventListener('change', function() {
-            selectAllSeries.checked = Array.from(seriesBoxes).every(c => c.checked);
-          });
-        });
-      }
-
-      // --- GÉRER TOUT SÉLECTIONNER POUR DECKS ---
-      var selectAllDecks = document.getElementById('select_all_decks');
-      if (selectAllDecks) {
-        selectAllDecks.addEventListener('change', function() {
-          var deckBoxes = document.querySelectorAll('input[name="deck"]');
-          deckBoxes.forEach(function(cb) { cb.checked = selectAllDecks.checked; });
-          document.getElementById('form-filtres').submit();
-        });
-        // Synchroniser l'état de select_all_decks au chargement
-        var deckBoxes = document.querySelectorAll('input[name="deck"]');
-        if (deckBoxes.length > 0) {
-          selectAllDecks.checked = Array.from(deckBoxes).every(cb => cb.checked);
-        }
-        deckBoxes.forEach(function(cb) {
-          cb.addEventListener('change', function() {
-            selectAllDecks.checked = Array.from(deckBoxes).every(c => c.checked);
-          });
-        });
-      }
-    });
-
-    // Avant la soumission, on met à jour le champ caché "substyles"
-    document.getElementById('form-filtres').addEventListener('submit', function(e) {
-      let subChecked = [];
-      var subGold = document.getElementById('sub-GOLD');
-      if (subGold) {
-        subGold.querySelectorAll('input[type=checkbox]').forEach(i => {
-          if (i.checked) subChecked.push(i.value);
-        });
-      }
-      let hidden = document.getElementById('hidden_substyles');
-      if (subChecked.length > 0) {
-        hidden.value = 'GOLD:' + subChecked.join(',');
-      } else {
-        hidden.value = '';
-      }
-    });
-  </script>
-
-  <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      // MEGA-PRIMO vs NO MEGA-PRIMO (Style vs Option négative)
-      var styleMega = document.querySelector('input[name="style"][value="MEGA-PRIMO"]');
-      var noMega = document.querySelector('input[name="no_mega_primo"]');
-      if (styleMega && noMega) {
-        styleMega.addEventListener('change', function() { if (styleMega.checked) noMega.checked = false; });
-        noMega.addEventListener('change', function() { if (noMega.checked) styleMega.checked = false; });
-      }
-      // OPTION MEGA-PRIMO vs STYLE MEGA-PRIMO (Option vs Style)
-      var optMega = document.querySelector('input[name="opt_megaprimo"]');
-      if (optMega && styleMega) {
-        optMega.addEventListener('change', function() { if (optMega.checked) styleMega.checked = false; });
-        styleMega.addEventListener('change', function() { if (styleMega.checked) optMega.checked = false; });
-      }
-      // FULL ART vs NO FULL ART (Style vs Option négative)
-      var styleFA = document.querySelector('input[name="style"][value="FULL ART"]');
-      var noFA = document.querySelector('input[name="no_fullart"]');
-      if (styleFA && noFA) {
-        styleFA.addEventListener('change', function() {
-          if (styleFA.checked) {
-            noFA.checked = false;
-            document.getElementById('form-filtres').submit();
-          }
-        });
-        noFA.addEventListener('change', function() {
-          if (noFA.checked) {
-            styleFA.checked = false;
-            document.getElementById('form-filtres').submit();
-          }
-        });
-      }
-      // OPTION FULL ART vs STYLE FULL ART (Option vs Style)
-      var optFA = document.querySelector('input[name="opt_fullart"]');
-      if (optFA && styleFA) {
-        optFA.addEventListener('change', function() { if (optFA.checked) styleFA.checked = false; });
-        styleFA.addEventListener('change', function() { if (styleFA.checked) optFA.checked = false; });
-      }
-      // BORDER GOLD vs NO BORDER GOLD (Style vs Option négative)
-      var styleBG = document.querySelector('input[name="style"][value="BORDER GOLD"]');
-      var noBG = document.querySelector('input[name="no_border_gold"]');
-      if (styleBG && noBG) {
-        styleBG.addEventListener('change', function() { if (styleBG.checked) noBG.checked = false; });
-        noBG.addEventListener('change', function() { if (noBG.checked) styleBG.checked = false; });
-      }
-      // OPTION BORDER GOLD vs STYLE BORDER GOLD (Option vs Style)
-      var optBG = document.querySelector('input[name="opt_bordergold"]');
-      if (optBG && styleBG) {
-        optBG.addEventListener('change', function() { if (optBG.checked) styleBG.checked = false; });
-        styleBG.addEventListener('change', function() { if (styleBG.checked) optBG.checked = false; });
-      }
-    });
-  </script>
+  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 </body>
-  <!-- Lightbox overlay -->
-  <div id="lightbox-overlay">
-    <img src="" alt="Carte agrandie">
-  </div>
-
-  <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      const overlay = document.getElementById('lightbox-overlay');
-      const overlayImg = overlay.querySelector('img');
-
-      document.querySelectorAll('img.miniature').forEach(function(img) {
-        img.addEventListener('click', function(event) {
-          event.preventDefault();
-          overlayImg.src = this.src;
-          overlayImg.alt = this.alt || "Carte agrandie";
-          overlay.classList.add('visible');
-        });
-      });
-
-      overlay.addEventListener('click', function(e) {
-        if (e.target === overlay) {
-          overlay.classList.remove('visible');
-          setTimeout(() => { overlayImg.src = ""; }, 300);
-        }
-      });
-    });
-  </script>
 </html>
