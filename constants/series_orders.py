@@ -62,3 +62,110 @@ SS_DECK_ORDER = [
     "SEF","SEK","SF","SP3","SP4","SGG","SGI","SH","SP5","SJ","S8A-G","SI",
     "CDCH","SK","SLD","SLL","SN","SPD","SPZ","SP6","SPO"
 ]
+
+DP_SERIES_ORDER = [
+    "DPP",  # PROMO
+    "DP1",
+    "DP2",
+    "DP3",
+    "WCP",
+    "DP4D",
+    "DP4M",
+    "DP5C",
+    "DP5T",
+    "DP6"
+]
+
+DP_DECK_ORDER = [
+    "DCSDP3",
+    "PCSDP3",
+    "HRDK"
+]
+
+DPT_SERIES_ORDER = [
+    "DPTP",  # PROMO
+    "PT1",
+    "PT2",
+    "PT3",
+    "PT4"
+]
+
+DPT_DECK_ORDER = [
+    "SPGAL",
+    "SPINF",
+    "SPCHA",
+    "SPGAR",
+    "CPM",
+    "CPR",
+    "CPS",
+    "AGF",
+    "ALP"
+]
+
+PCG_SERIES_ORDER = [
+    "PCGP",  # PROMO
+    "PCG1",
+    "PCG2",
+    "PCG3",
+    "PCG4",
+    "PCG5",
+    "PCG6",
+    "PCG7",
+    "PCG8",
+    "PCG9"
+]
+
+PCG_DECK_ORDER = [
+    "VCBR",
+    "RCS",
+    "DCS",
+    "BDK",
+    "SDK",
+    "GBED",
+    "GBER",
+    "QCPG",
+    "QCPFIR",
+    "QCPW",
+    "QCPL",
+    "QCPP",
+    "QCPFIG",
+    "MCS",
+    "TCS",
+    "FECS",
+    "MMCS",
+    "MKS",
+    "HRTF",
+    "HRTL",
+    "HRTW",
+    "GBMLPS",
+    "GBMLMI",
+    "GBMLME",
+    "GBMLLU",
+    "GBMLCR",
+    "EGCS",
+    "OKCS",
+    "IGCS",
+    "STCS"
+]
+
+ADV_SERIES_ORDER = [
+    "ADVP",  # PROMO
+    "ADV1",
+    "ADV2",
+    "ADV3",
+    "ADV4",
+    "ADV5"
+]
+
+ADV_DECK_ORDER = [
+    "MUCS",
+    "TOCS",
+    "TRCS",
+    "FCS",
+    "SCS",
+    "ADK",
+    "MDK",
+    "GBLAHD",
+    "GBLOHD",
+    "MECS"
+]

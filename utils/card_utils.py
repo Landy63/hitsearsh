@@ -21,11 +21,15 @@ def extract_card_name(filename):
     """
     Extrait le nom de la carte entre le 2e et le 3e underscore, nettoie les tirets et espaces.
     """
+    import urllib.parse
+    
     name = os.path.splitext(filename)[0]
     parts = name.split('_')
-    if len(parts) >= 4:
+    if len(parts) >= 3:
         card_name = parts[2]
     else:
         card_name = ''
-    card_name = card_name.replace('-', ' ').strip()
+    
+    # Décoder les caractères URL encodés (comme %20) et remplacer les tirets par des espaces
+    card_name = urllib.parse.unquote(card_name).replace('-', ' ').strip()
     return card_name.upper()

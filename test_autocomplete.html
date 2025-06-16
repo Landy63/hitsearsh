@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Autocomplete</title>
+    <style>
+        .search-wrapper {
+            position: relative;
+            width: 400px;
+            margin: 50px auto;
+        }
+        
+        .search-input {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        
+        .autocomplete-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            background: white;
+            border: 1px solid #4a90e2;
+            border-top: none;
+            border-radius: 0 0 4px 4px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            max-height: 200px;
+            overflow-y: auto;
+            display: none;
+        }
+        
+        .autocomplete-item {
+            padding: 10px;
+            cursor: pointer;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .autocomplete-item:hover {
+            background: #f0f0f0;
+        }
+    </style>
+</head>
+<body>
+    <div class="search-wrapper">
+        <input id="search-bar" type="text" class="search-input" placeholder="Tapez ici pour tester...">
+        <ul id="autocomplete-list" class="autocomplete-dropdown"></ul>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchBar = document.getElementById('search-bar');
+            const list = document.getElementById('autocomplete-list');
+            
+            console.log('Test elements:', { searchBar, list });
+            
+            if (searchBar && list) {
+                searchBar.addEventListener('input', function() {
+                    const val = this.value.trim();
+                    console.log('Input value:', val);
+                    
+                    if(val.length < 1) { 
+                        list.style.display = 'none'; 
+                        list.innerHTML = ''; 
+                        return; 
+                    }
+                    
+                    console.log('Fetching...');
+                    
+                    fetch(`/autocomplete?q=${encodeURIComponent(val)}`)
+                        .then(r => {
+                            console.log('Response status:', r.status);
+                            return r.json();
+                        })
+                        .then(data => {
+                            console.log('Data received:', data);
+                            
+                            list.innerHTML = '';
+                            if(data.length === 0) { 
+                                list.style.display = 'none'; 
+                                return; 
+                            }
+                            
+                            data.forEach(s => {
+                                const li = document.createElement('li');
+                                li.textContent = s;
+                                li.className = 'autocomplete-item';
+                                li.addEventListener('click', function() {
+                                    searchBar.value = s;
+                                    list.style.display = 'none';
+                                });
+                                list.appendChild(li);
+                            });
+                            
+                            list.style.display = 'block';
+                            console.log('Dropdown should be visible now');
+                        })
+                        .catch(err => {
+                            console.error('Error:', err);
+                        });
+                });
+            }
+        });
+    </script>
+</body>
+</html>

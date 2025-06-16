@@ -25,7 +25,19 @@ def index():
     selected_series = [s.upper() for s in request.args.getlist('series')]
     selected_decks = [d.upper() for d in request.args.getlist('deck')]
 
-    # Construction de la liste des séries autorisées pour l’accordéon
+    # Nouvelle gestion des substyles pour LV.X, BlackStar et nouveaux substyles
+    substyle_lvx_sp = request.args.get('substyle_lvx_sp') == '1'
+    substyle_no_lvx_sp = request.args.get('substyle_no_lvx_sp') == '1'
+    substyle_blackstar = request.args.get('substyle_blackstar') == '1'
+    substyle_no_blackstar = request.args.get('substyle_no_blackstar') == '1'
+    substyle_delta = request.args.get('substyle_delta') == '1'
+    substyle_no_delta = request.args.get('substyle_no_delta') == '1'
+    substyle_rocket = request.args.get('substyle_rocket') == '1'
+    substyle_no_rocket = request.args.get('substyle_no_rocket') == '1'
+    substyle_ex_holo = request.args.get('substyle_ex_holo') == '1'
+    substyle_no_ex_holo = request.args.get('substyle_no_ex_holo') == '1'
+
+    # Construction de la liste des séries autorisées pour l'accordéon
     allowed_series = []
     for era in selected_eras:
         allowed_series.extend(ERA_TO_SERIES.get(era, []))
@@ -35,7 +47,8 @@ def index():
 
     # Détermination des types disponibles dans le contexte
     all_types = [
-        "EX", "SHINING", "BREAK", "V", "VMAX", "VSTAR", "V-UNION", "GX", "TRAINERS", "ENERGY", "PRIME", "LEGEND",
+        "EX", "SHINING", "BREAK", "V", "VMAX", "VSTAR", "V-UNION", "GX",
+        "LV.X", "GOLDSTAR", "TRAINERS", "ENERGY", "PRIME", "LEGEND"
     ]
     available_types = []
     def matches_type_with_substyle(name, types, substyles):
@@ -74,7 +87,7 @@ def index():
 
     # Détermination des styles disponibles dans le contexte
     all_styles = [
-        "ALTERNATIVE", "ARSTYLE", "BORDER GOLD", "CHARACTERS RARES", "FULL ART", "GOLD", "MEGA-PRIMO", "RAINBOW", "SHINY", "LEGENDARY"
+        "ALTERNATIVE", "ARSTYLE", "BORDER GOLD", "CHARACTERS RARES", "FULL ART", "GOLD", "MEGA-PRIMO", "RAINBOW", "SHINY", "LEGENDARY", "DELTA SPECIES"
     ]
     available_styles = []
     def matches_style_included(name, styles, substyles):
@@ -101,6 +114,8 @@ def index():
                 return False
             elif style == "LEGENDARY" and "LGDRY" not in name:
                 return False
+            elif style == "DELTA SPECIES" and "_DELTA" not in name:
+                return False
         return True
     for s in all_styles:
         for chemin in context_cards:
@@ -125,6 +140,16 @@ def index():
         'shiny': any("_SHINY" in os.path.basename(c).upper() for c in context_cards),
         'tagteam': any("_TAGTEAM" in os.path.basename(c).upper() for c in context_cards),
         'trainers': any("_TRAINERS" in os.path.basename(c).upper() for c in context_cards),
+        'lvx_sp': any("_LV.X_SP" in os.path.basename(c).upper() for c in context_cards),
+        'no_lvx_sp': any("_LV.X" in os.path.basename(c).upper() and "_SP" not in os.path.basename(c).upper() for c in context_cards),
+        'delta': any("_DELTA" in os.path.basename(c).upper() for c in context_cards),
+        'no_delta': any("_DELTA" in os.path.basename(c).upper() for c in context_cards),
+        'rocket': any("_ROCKET" in os.path.basename(c).upper() for c in context_cards),
+        'no_rocket': any("_ROCKET" in os.path.basename(c).upper() for c in context_cards),
+        'ex_holo': any("_EX_HOLO" in os.path.basename(c).upper() for c in context_cards),
+        'no_ex_holo': any("_EX_HOLO" in os.path.basename(c).upper() for c in context_cards),
+        'blackstar': any("_BLACKSTAR" in os.path.basename(c).upper() for c in context_cards),
+        'no_blackstar': any("_BLACKSTAR" in os.path.basename(c).upper() for c in context_cards),
         # Options négatives
         'no_alternatives': any("_ALT" in os.path.basename(c).upper() for c in context_cards),
         'no_black_gold': any("_BLACK_GOLD" in os.path.basename(c).upper() for c in context_cards),
@@ -197,45 +222,54 @@ def index():
     # Filtrage principal
     cartes_filtrees = filter_cards(
         toutes_les_cartes,
-        selected_rarities,
-        selected_types,
-        selected_styles,
-        selected_substyles,
-        selected_excluded_styles,
-        no_fullart,
-        no_characters,
-        no_trainers,
-        no_gold_opt,
-        no_shiny_opt,
-        no_alternative_opt,
-        no_rainbow_opt,
-        no_holo_shiny,
-        no_k_shiny,
-        no_mega_primo,
-        opt_fullart,
-        opt_megaprimo,
-        opt_bordergold,
-        opt_gold,
-        opt_alternative,
-        opt_alternative_gold,
-        opt_blackgold,
-        opt_characters,
-        opt_metal,
-        opt_rainbow,
-        opt_shiny,
-        opt_trainers,
-        opt_tagteam,
-        no_tagteam,
-        metal,
-        no_metal,
-        no_border_gold,
-        no_blackgold,
-        no_gold_metal,
-        plasma,
-        no_plasma,
-        selected_eras,
-        selected_series,
-        selected_decks
+        selected_rarities=selected_rarities,
+        selected_types=selected_types,
+        selected_styles=selected_styles,
+        selected_excluded_styles=selected_excluded_styles,
+        substyle_blackstar=substyle_blackstar,
+        substyle_no_blackstar=substyle_no_blackstar,
+        substyle_lvx_sp=substyle_lvx_sp,
+        substyle_no_lvx_sp=substyle_no_lvx_sp,
+        substyle_delta=substyle_delta,
+        substyle_no_delta=substyle_no_delta,
+        substyle_rocket=substyle_rocket,
+        substyle_no_rocket=substyle_no_rocket,
+        substyle_ex_holo=substyle_ex_holo,
+        substyle_no_ex_holo=substyle_no_ex_holo,
+        no_fullart=no_fullart,
+        no_characters=no_characters,
+        no_trainers=no_trainers,
+        no_gold_opt=no_gold_opt,
+        no_shiny_opt=no_shiny_opt,
+        no_alternative_opt=no_alternative_opt,
+        no_rainbow_opt=no_rainbow_opt,
+        no_holo_shiny=no_holo_shiny,
+        no_k_shiny=no_k_shiny,
+        no_mega_primo=no_mega_primo,
+        opt_fullart=opt_fullart,
+        opt_megaprimo=opt_megaprimo,
+        opt_bordergold=opt_bordergold,
+        opt_gold=opt_gold,
+        opt_alternative=opt_alternative,
+        opt_alternative_gold=opt_alternative_gold,
+        opt_blackgold=opt_blackgold,
+        opt_characters=opt_characters,
+        opt_metal=opt_metal,
+        opt_rainbow=opt_rainbow,
+        opt_shiny=opt_shiny,
+        opt_trainers=opt_trainers,
+        opt_tagteam=opt_tagteam,
+        no_tagteam=no_tagteam,
+        metal=metal,
+        no_metal=no_metal,
+        no_border_gold=no_border_gold,
+        no_blackgold=no_blackgold,
+        no_gold_metal=no_gold_metal,
+        plasma=plasma,
+        no_plasma=no_plasma,
+        selected_eras=selected_eras,
+        selected_series=selected_series,
+        selected_decks=selected_decks
     )
 
     # Recherche par nom (appliquée après tous les autres filtres)
@@ -250,7 +284,19 @@ def index():
         series_list = []
         deck_list = []
         for era_key in ERA_TO_SERIES:
-            if era_key == "HGSS":
+            if era_key == "ADV":
+                series_list.extend(ADV_SERIES_ORDER)
+                deck_list.extend(ADV_DECK_ORDER)
+            elif era_key == "PCG":
+                series_list.extend(PCG_SERIES_ORDER)
+                deck_list.extend(PCG_DECK_ORDER)
+            elif era_key == "DIAMOND_AND_PEARL":
+                series_list.extend(DP_SERIES_ORDER)
+                deck_list.extend(DP_DECK_ORDER)
+            elif era_key == "PLATINUM":
+                series_list.extend(DPT_SERIES_ORDER)
+                deck_list.extend(DPT_DECK_ORDER)
+            elif era_key == "HGSS":
                 series_list.extend(HGSS_SERIES_ORDER)
                 deck_list.extend(HGSS_DECK_ORDER)
             elif era_key == "BLACK_AND_WHITE":
@@ -269,7 +315,19 @@ def index():
         series_list = []
         deck_list = []
         for era in selected_eras:
-            if era == "HGSS":
+            if era == "ADV":
+                series_list.extend(ADV_SERIES_ORDER)
+                deck_list.extend(ADV_DECK_ORDER)
+            elif era == "PCG":
+                series_list.extend(PCG_SERIES_ORDER)
+                deck_list.extend(PCG_DECK_ORDER)
+            elif era == "DIAMOND_AND_PEARL":
+                series_list.extend(DP_SERIES_ORDER)
+                deck_list.extend(DP_DECK_ORDER)
+            elif era == "PLATINUM":
+                series_list.extend(DPT_SERIES_ORDER)
+                deck_list.extend(DPT_DECK_ORDER)
+            elif era == "HGSS":
                 series_list.extend(HGSS_SERIES_ORDER)
                 deck_list.extend(HGSS_DECK_ORDER)
             elif era == "BLACK_AND_WHITE":
@@ -317,21 +375,38 @@ def index():
 
     cartes_filtrees.sort(key=sort_key_dynamic)
 
-    # Pagination : découpe cartes_filtrees en pages de 150
+    # Pagination : découpe cartes_filtrees en pages modulables
     page = request.args.get('page', 1)
+    per_page = request.args.get('per_page', 150)
     try:
         current_page = int(page)
     except ValueError:
         current_page = 1
+    try:
+        per_page = int(per_page)
+        if per_page not in [50, 100, 150, 200, 250, 300]:
+            per_page = 150  # Valeur par défaut si invalide
+    except ValueError:
+        per_page = 150
+        
     if current_page < 1:
         current_page = 1
     total_cards = len(cartes_filtrees)
-    total_pages = math.ceil(total_cards / 150) if total_cards > 0 else 1
+    total_pages = math.ceil(total_cards / per_page) if total_cards > 0 else 1
     if current_page > total_pages:
         current_page = total_pages
-    start_idx = (current_page - 1) * 150
-    end_idx = start_idx + 150
+    start_idx = (current_page - 1) * per_page
+    end_idx = start_idx + per_page
     page_cards = cartes_filtrees[start_idx:end_idx]
+
+    # Extraire les noms des cartes pour l'affichage
+    cards_with_names = []
+    for card_path in page_cards:
+        card_name = extract_card_name(os.path.basename(card_path))
+        cards_with_names.append({
+            'path': card_path,
+            'name': card_name
+        })
 
     # Indicateurs pour la section Options Supplémentaires
     show_no_bordergold_for_megaprimo = "MEGA-PRIMO" in selected_styles
@@ -339,13 +414,13 @@ def index():
 
     return render_template(
         'index.html',
-        cartes=page_cards,
+        cartes=cards_with_names,
         rarities=RARITY_ORDER,
         types=[
-            "EX", "SHINING", "BREAK", "V", "VMAX", "VSTAR", "V-UNION", "GX", "TRAINERS", "ENERGY", "PRIME", "LEGEND"
+            "EX", "SHINING", "BREAK", "V", "VMAX", "VSTAR", "V-UNION", "GX", "TRAINERS", "ENERGY", "PRIME", "LEGEND", "LV.X", "GOLDSTAR"
         ],
         styles=[
-            "ALTERNATIVE", "ARSTYLE", "BORDER GOLD", "CHARACTERS RARES", "FULL ART", "GOLD", "MEGA-PRIMO", "RAINBOW", "SHINY", "LEGENDARY"
+            "ALTERNATIVE", "ARSTYLE", "BORDER GOLD", "CHARACTERS RARES", "FULL ART", "GOLD", "MEGA-PRIMO", "RAINBOW", "SHINY", "LEGENDARY", "DELTA SPECIES"
         ],
         substyles={},
         available_types=available_types,
@@ -368,6 +443,7 @@ def index():
         total_cards=total_cards,
         current_page=current_page,
         total_pages=total_pages,
+        per_page=per_page,
         search_query=search_query,
     )
 
@@ -388,4 +464,4 @@ def autocomplete():
     return jsonify(suggestions)
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, port=5001)
