@@ -11,7 +11,7 @@ Exemple :
 import os
 import sys
 
-def rename_xy_images(xy_root="static/cards/ADV"):
+def rename_xy_images(xy_root="static/cards/WEB"):
     """
     Parcourt récursivement le dossier xy_root et renomme chaque fichier image en
     ajoutant le chemin relatif (depuis xy_root) comme suffixe au nom principal.
@@ -56,5 +56,5 @@ if __name__ == "__main__":
     if len(sys.argv) > 1:
         root_dir = sys.argv[1]
     else:
-        root_dir = "static/cards/ADV"
+        root_dir = "static/cards/WEB"
     rename_xy_images(root_dir)

@@ -5,7 +5,7 @@ from constants.series_orders import *
 from constants.eras import ERA_TO_SERIES, ERA_TO_FOLDER, ERA_LABELS
 from constants.rarities import RARITY_ORDER
 from utils.card_utils import lister_toutes_les_cartes, extract_card_name
-from utils.filters import filter_cards
+from utils.filters import filter_cards, card_belongs_to_eras
 
 app = Flask(__name__)
 
@@ -48,7 +48,7 @@ def index():
     # Détermination des types disponibles dans le contexte
     all_types = [
         "EX", "SHINING", "BREAK", "V", "VMAX", "VSTAR", "V-UNION", "GX",
-        "LV.X", "GOLDSTAR", "TRAINERS", "ENERGY", "PRIME", "LEGEND"
+        "LV.X", "GOLDSTAR", "TRAINERS", "ENERGY", "PRIME", "LEGEND", "HOLO"
     ]
     available_types = []
     def matches_type_with_substyle(name, types, substyles):
@@ -77,6 +77,14 @@ def index():
                 return True
             elif t == "LEGEND" and "LEGEND" in name:
                 return True
+            # Pour HOLO, nous vérifions séparément les ères
+            elif t == "HOLO" and "_HOLO" in name:
+                for chemin in context_cards:
+                    if os.path.basename(chemin).upper() == name:
+                        # Vérifier si la carte appartient à VS, WEB ou E-Series Era
+                        if card_belongs_to_eras(chemin, ["VS", "WEB", "E_SERIES"]):
+                            return True
+                return False
         return False
     for t in all_types:
         for chemin in context_cards:
@@ -188,6 +196,8 @@ def index():
     no_gold_metal = 'no_gold_metal' in request.args
     plasma = ('plasma' in request.args) or ('opt_plasma' in request.args)
     no_plasma = 'no_plasma' in request.args
+    opt_dark = 'opt_dark' in request.args
+    no_dark = 'no_dark' in request.args
     opt_fullart = 'opt_fullart' in request.args
     opt_megaprimo = 'opt_megaprimo' in request.args
     opt_bordergold = 'opt_bordergold' in request.args
@@ -243,6 +253,7 @@ def index():
         no_shiny_opt=no_shiny_opt,
         no_alternative_opt=no_alternative_opt,
         no_rainbow_opt=no_rainbow_opt,
+        no_dark=no_dark,
         no_holo_shiny=no_holo_shiny,
         no_k_shiny=no_k_shiny,
         no_mega_primo=no_mega_primo,
@@ -258,6 +269,7 @@ def index():
         opt_rainbow=opt_rainbow,
         opt_shiny=opt_shiny,
         opt_trainers=opt_trainers,
+        opt_dark=opt_dark,
         opt_tagteam=opt_tagteam,
         no_tagteam=no_tagteam,
         metal=metal,
@@ -417,7 +429,7 @@ def index():
         cartes=cards_with_names,
         rarities=RARITY_ORDER,
         types=[
-            "EX", "SHINING", "BREAK", "V", "VMAX", "VSTAR", "V-UNION", "GX", "TRAINERS", "ENERGY", "PRIME", "LEGEND", "LV.X", "GOLDSTAR"
+            "EX", "SHINING", "BREAK", "V", "VMAX", "VSTAR", "V-UNION", "GX", "TRAINERS", "ENERGY", "PRIME", "LEGEND", "LV.X", "GOLDSTAR", "HOLO"
         ],
         styles=[
             "ALTERNATIVE", "ARSTYLE", "BORDER GOLD", "CHARACTERS RARES", "FULL ART", "GOLD", "MEGA-PRIMO", "RAINBOW", "SHINY", "LEGENDARY", "DELTA SPECIES"

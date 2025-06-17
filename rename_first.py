@@ -51,6 +51,6 @@ def rename_images_in_root(root_dir):
 if __name__ == "__main__":
     import sys
     # Racines à traiter : arguments passés ou par défaut ['S&S']
-    roots = sys.argv[1:] if len(sys.argv) > 1 else ['ADV']
+    roots = sys.argv[1:] if len(sys.argv) > 1 else ['WEB']
     for root in roots:
         rename_images_in_root(root)

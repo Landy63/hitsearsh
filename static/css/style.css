@@ -19,8 +19,8 @@
   --shadow-medium: 0 4px 15px rgba(0, 0, 0, 0.2);
   --shadow-heavy: 0 8px 32px rgba(0, 0, 0, 0.3);
   --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  --border-radius: 12px;
-  --border-radius-small: 8px;
+  --border-radius: 14px;
+  --border-radius-small: 10px;
 }
 
 * {
@@ -545,16 +545,16 @@ details > div > div:hover {
   width: 100%;
   height: auto;
   border: 2px solid #444;
-  border-radius: var(--border-radius);
-  transition: all 0.3s ease, border-radius 0.3s ease;
+  border-radius: 4.5% / 3.5%;
+  transition: all 0.3s ease;
   cursor: pointer;
 }
 
 .carte img:hover {
   transform: translateY(-8px);
-  box-shadow: 0 var(--border-radius) 35px rgba(74, 144, 226, 0.5);
+  box-shadow: 0 8px 35px rgba(74, 144, 226, 0.5);
   border-color: var(--primary-blue);
-  border-radius: 14px;
+  animation: subtleGlow 3s infinite;
 }
 
 .card-name {
@@ -629,7 +629,7 @@ details > div > div:hover {
   max-width: 85vw;
   max-height: 75vh;
   height: auto;
-  border-radius: 16px;
+  border-radius: 4.5% / 3.5%;
   box-shadow: 0 25px 80px rgba(0, 0, 0, 0.9);
   transition: all 0.4s ease;
   animation: slideIn 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
@@ -971,4 +971,17 @@ details > div > div:hover {
   .per-page-options {
     min-width: 140px;
   }
+}
+
+/* Style spécifique pour les coins de carte Pokémon */
+.pokemon-card-corners {
+  /* Alternative avec border-radius */
+  border-radius: 4.5% / 3.5%;
+}
+
+/* Animation subtile au survol pour les cartes */
+@keyframes subtleGlow {
+  0% { box-shadow: 0 0 10px rgba(74, 144, 226, 0.3); }
+  50% { box-shadow: 0 0 20px rgba(74, 144, 226, 0.5); }
+  100% { box-shadow: 0 0 10px rgba(74, 144, 226, 0.3); }
 }

@@ -9,7 +9,7 @@ except ImportError:
     exit(1)
 
 # Chemin vers le fichier PDF contenant les liens
-LINKS_PDF_PATH = Path(__file__).parent / "ADV_links.pdf"
+LINKS_PDF_PATH = Path(__file__).parent / "VS_links.pdf"
 DEST_DIR = Path(__file__).parent / "pdf"
 DEST_DIR.mkdir(exist_ok=True)
 

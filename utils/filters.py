@@ -6,11 +6,11 @@ def filter_cards(cartes, selected_rarities, selected_types, selected_styles, sel
                  substyle_delta=False, substyle_no_delta=False, substyle_rocket=False, substyle_no_rocket=False,
                  substyle_ex_holo=False, substyle_no_ex_holo=False,
                  no_fullart=False, no_characters=False, no_trainers=False, no_gold_opt=False, no_shiny_opt=False,
-                 no_alternative_opt=False, no_rainbow_opt=False,
+                 no_alternative_opt=False, no_rainbow_opt=False, no_dark=False,
                  no_holo_shiny=False, no_k_shiny=False, no_mega_primo=False,
                  opt_fullart=False, opt_megaprimo=False, opt_bordergold=False, opt_gold=False,
                  opt_alternative=False, opt_alternative_gold=False, opt_blackgold=False, opt_characters=False,
-                 opt_metal=False, opt_rainbow=False, opt_shiny=False, opt_trainers=False,
+                 opt_metal=False, opt_rainbow=False, opt_shiny=False, opt_trainers=False, opt_dark=False,
                  opt_tagteam=False, no_tagteam=False,
                  metal=False, no_metal=False, no_border_gold=False, no_blackgold=False, no_gold_metal=False,
                  plasma=False, no_plasma=False,
@@ -62,6 +62,7 @@ def filter_cards(cartes, selected_rarities, selected_types, selected_styles, sel
         if not selected_types:
             return True
         name = os.path.basename(path).upper()
+        path_upper = path.upper()
         for t in selected_types:
             if t == "EX":
                 if "_EX_" in name or "_EX." in name:
@@ -93,6 +94,11 @@ def filter_cards(cartes, selected_rarities, selected_types, selected_styles, sel
             elif t == "ENERGY":
                 if "_ENERGY_" in name or "_ENERGY." in name:
                     return True
+            elif t == "HOLO":
+                # Vérifier si la carte est HOLO et qu'elle appartient aux ères VS, WEB ou E-Series
+                if (("_HOLO_" in name or "_HOLO." in name) and 
+                    card_belongs_to_eras(path, ["VS", "WEB", "E_SERIES"])):
+                    return True
             elif t == "PRIME":
                 if "_PRIME_" in name or "_PRIME." in name:
                     return True
@@ -104,7 +110,6 @@ def filter_cards(cartes, selected_rarities, selected_types, selected_styles, sel
                     return True
             elif t == "LV.X":
                 if "_LV.X_" in name or "_LV.X." in name:
-                    return True
                     return True
             elif t == "GOLDSTAR":
                 if "_GOLDSTAR_" in name or "_GOLDSTAR." in name:
@@ -251,6 +256,8 @@ def filter_cards(cartes, selected_rarities, selected_types, selected_styles, sel
             return False
         if no_plasma and ("_PLASMA_" in name or "_PLASMA." in name):
             return False
+        if no_dark and ("_DARK_" in name or "_DARK." in name):
+            return False
         
         # Filtres positifs
         if opt_fullart and not ("_FA_" in name or "_FA." in name):
@@ -283,6 +290,8 @@ def filter_cards(cartes, selected_rarities, selected_types, selected_styles, sel
             return False
         if plasma and not ("_PLASMA_" in name or "_PLASMA." in name):
             return False
+        if opt_dark and not ("_DARK_" in name or "_DARK." in name):
+            return False
         
         return True
 
@@ -300,3 +309,32 @@ def filter_cards(cartes, selected_rarities, selected_types, selected_styles, sel
             continue
         filtered.append(path)
     return filtered
+
+def card_belongs_to_era(path, era):
+    """
+    Vérifie si une carte appartient à une ère spécifique.
+    
+    Args:
+        path (str): Chemin complet de la carte
+        era (str): Clé de l'ère dans ERA_TO_FOLDER
+        
+    Returns:
+        bool: True si la carte appartient à l'ère, False sinon
+    """
+    from constants.eras import ERA_TO_FOLDER
+    path_upper = path.upper()
+    folder = ERA_TO_FOLDER.get(era, era).upper()
+    return f"/CARDS/{folder}/" in f"/{path_upper}"
+
+def card_belongs_to_eras(path, eras):
+    """
+    Vérifie si une carte appartient à une des ères spécifiées.
+    
+    Args:
+        path (str): Chemin complet de la carte
+        eras (list): Liste des clés d'ère dans ERA_TO_FOLDER
+        
+    Returns:
+        bool: True si la carte appartient à une des ères, False sinon
+    """
+    return any(card_belongs_to_era(path, era) for era in eras)

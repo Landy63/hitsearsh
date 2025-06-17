@@ -4,7 +4,7 @@ from pathlib import Path
 from PyPDF2 import PdfReader
 
 pdf_dir = Path(__file__).parent / "pdf"
-cards_dir = Path(__file__).parent / "ADV"
+cards_dir = Path(__file__).parent / "ES"
 
 # Crée un dictionnaire global : {"EGCS": {8: "Groudon ex", ...}, ...}
 card_map = {}

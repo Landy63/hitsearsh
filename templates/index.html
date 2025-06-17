@@ -54,7 +54,7 @@
               <div>
                 <input type="checkbox" name="era" value="{{ era }}"
                   {% if era in selected_eras %}checked{% endif %}>
-                <label>{{ era.replace('_', ' ') }}</label>
+                <label>{{ era_labels[era] }}</label>
               </div>
             {% endfor %}
           </div>
@@ -145,6 +145,7 @@
           ("BLACKSTAR", "substyle_blackstar"),
           ("BORDER GOLD", "opt_bordergold"),
           ("CHARACTER RARES", "opt_characters"),
+          ("DARK", "opt_dark"),
           ("DELTA", "substyle_delta"),
           ("EX HOLO", "substyle_ex_holo"),
           ("FULL ART", "opt_fullart"),
@@ -175,6 +176,7 @@
           ("NO BLACKSTAR", "substyle_no_blackstar"),
           ("NO BORDER GOLD", "no_border_gold"),
           ("NO CHARACTER RARES", "no_characters"),
+          ("NO DARK", "no_dark"),
           ("NO DELTA", "substyle_no_delta"),
           ("NO EX HOLO", "substyle_no_ex_holo"),
           ("NO FULL ART", "no_fullart"),

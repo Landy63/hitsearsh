@@ -169,3 +169,45 @@ ADV_DECK_ORDER = [
     "GBLOHD",
     "MECS"
 ]
+
+# Nouvelles ères : VS Era, WEB Era, E-Series Era
+VS_SERIES_ORDER = [
+    "VSP",  # PROMO
+    "VS1",
+    "VS2",
+    "VS3",
+    "VS4",
+    "VS5"
+]
+
+VS_DECK_ORDER = [
+    "VSDK1",
+    "VSDK2",
+    "VSDK3"
+]
+
+PW_SERIES_ORDER = [
+    "PWP",  # PROMO
+    "PW1",
+    "PW2",
+    "PW3"
+]
+
+PW_DECK_ORDER = [
+    "PWDK1",
+    "PWDK2"
+]
+
+ES_SERIES_ORDER = [
+    "ESP",  # PROMO
+    "ES1",
+    "ES2",
+    "ES3",
+    "ES4"
+]
+
+ES_DECK_ORDER = [
+    "ESDK1",
+    "ESDK2",
+    "ESDK3"
+]
