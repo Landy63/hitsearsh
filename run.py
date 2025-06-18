@@ -296,7 +296,16 @@ def index():
         series_list = []
         deck_list = []
         for era_key in ERA_TO_SERIES:
-            if era_key == "ADV":
+            if era_key == "VS":
+                series_list.extend(VS_SERIES_ORDER)
+                deck_list.extend(VS_DECK_ORDER)
+            elif era_key == "WEB":
+                series_list.extend(PW_SERIES_ORDER)
+                deck_list.extend(PW_DECK_ORDER)
+            elif era_key == "E_SERIES":
+                series_list.extend(ES_SERIES_ORDER)
+                deck_list.extend(ES_DECK_ORDER)
+            elif era_key == "ADV":
                 series_list.extend(ADV_SERIES_ORDER)
                 deck_list.extend(ADV_DECK_ORDER)
             elif era_key == "PCG":
@@ -327,7 +336,16 @@ def index():
         series_list = []
         deck_list = []
         for era in selected_eras:
-            if era == "ADV":
+            if era == "VS":
+                series_list.extend(VS_SERIES_ORDER)
+                deck_list.extend(VS_DECK_ORDER)
+            elif era == "WEB":
+                series_list.extend(PW_SERIES_ORDER)
+                deck_list.extend(PW_DECK_ORDER)
+            elif era == "E_SERIES":
+                series_list.extend(ES_SERIES_ORDER)
+                deck_list.extend(ES_DECK_ORDER)
+            elif era == "ADV":
                 series_list.extend(ADV_SERIES_ORDER)
                 deck_list.extend(ADV_DECK_ORDER)
             elif era == "PCG":
