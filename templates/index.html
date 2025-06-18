@@ -14,6 +14,7 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='css/iphone-specific-fixes.css') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/final-spacing-fix.css') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/pagination-mobile-fix.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/swipe-navigation.css') }}">
 </head>
 <body>
   <!-- HEADER MODERNE -->
@@ -346,6 +347,7 @@
         </span>
         <img id="lightbox-image" src="" alt="">
         <div id="lightbox-name" class="lightbox-card-name"></div>
+        <div class="swipe-indicator">Glissez vers la gauche ou la droite</div>
       </div>
     </div>
 
@@ -470,7 +472,9 @@
   </script>
 
   <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/main-swipe.js') }}"></script>
   <script src="{{ url_for('static', filename='js/pagination-fix.js') }}"></script>
   <script src="{{ url_for('static', filename='js/mobile-card-limit.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/swipe-navigation.js') }}"></script>
 </body>
 </html>
