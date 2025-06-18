@@ -1,0 +1,109 @@
+/* Corrections finales pour le header et les filtres */
+
+@media screen and (max-width: 768px) {
+  /* Header aligné à gauche avec spacing correct */
+  .header-content {
+    display: flex !important;
+    flex-direction: row !important;
+    justify-content: flex-start !important;
+    align-items: center !important;
+    padding: 15px 20px !important;
+    gap: 15px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  
+  /* Logo et nom du site */
+  .logo-container {
+    margin-right: 0 !important;
+    flex-shrink: 0 !important;
+    width: auto !important;
+  }
+  
+  .logo {
+    gap: 10px !important;
+  }
+  
+  .logo-text h1 {
+    font-size: 1.3rem !important;
+  }
+  
+  .logo-text .tagline {
+    font-size: 0.7rem !important;
+  }
+  
+  /* Barre de recherche adaptée */
+  .search-container {
+    max-width: 100% !important;
+    flex-grow: 1 !important;
+    width: auto !important;
+    margin-left: auto !important;
+  }
+  
+  .search-input {
+    font-size: 0.9rem !important;
+  }
+  
+  /* Menu filtres parfaitement sous le header */
+  .filtres {
+    top: 92px !important; /* Parfaitement collé au header - ajusté au pixel près */
+    padding-top: 15px !important;
+    height: calc(100vh - 92px) !important;
+    border-top: none !important; /* Suppression de la bordure pour éviter tout écart */
+    z-index: 999 !important;
+    margin-top: 0 !important;
+  }
+  
+  /* Assurer que le header est au-dessus */
+  .main-header {
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 1000 !important;
+    border-bottom: none !important; /* Suppression de la bordure pour éviter tout écart */
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3) !important; /* Ombre pour marquer la séparation */
+    height: 92px !important; /* Hauteur fixe pour assurer un alignement parfait */
+    box-sizing: border-box !important;
+  }
+  
+  /* Ajustement des cartes */
+  .grille #cards-container {
+    grid-template-columns: repeat(2, 1fr) !important;
+    padding: 0 !important;
+    grid-gap: 10px !important;
+  }
+  
+  /* Styles pour cartes individuelles */
+  .carte img {
+    border-width: 1px !important;
+  }
+  
+  .card-name {
+    font-size: 0.8rem !important;
+    margin-top: 5px !important;
+  }
+  
+  /* Assurer que le menu est correctement positionné */
+  .overlay {
+    z-index: 990 !important;
+  }
+}
+
+/* Ajustements pour très petits écrans */
+@media screen and (max-width: 400px) {
+  .logo-text h1 {
+    font-size: 1.1rem !important;
+  }
+  
+  .logo-text .tagline {
+    display: none !important;
+  }
+  
+  .header-content {
+    padding: 12px 15px !important;
+  }
+  
+  .logo-icon {
+    width: 38px !important;
+    height: 38px !important;
+  }
+}

@@ -1,0 +1,98 @@
+/* 
+ * pagination-mobile-fix.css - Optimisation de la pagination sur mobile
+ * Assure que la pagination reste sur une seule ligne avec une logique claire
+ */
+
+@media screen and (max-width: 768px) {
+  /* Container de pagination - garantir une seule ligne */
+  .pagination-container {
+    display: flex !important;
+    flex-wrap: nowrap !important; /* Empêcher le retour à la ligne */
+    justify-content: center !important;
+    align-items: center !important;
+    width: 100% !important;
+    overflow-x: auto !important; /* Permettre le défilement horizontal si nécessaire mais sans barre visible */
+    overflow-y: hidden !important;
+    scrollbar-width: none !important; /* Masquer la barre de défilement sur Firefox */
+    -ms-overflow-style: none !important; /* Masquer la barre de défilement sur IE/Edge */
+    white-space: nowrap !important;
+    padding: 15px 0 5px !important;
+    gap: 2px !important; /* Espacement minimal entre les éléments */
+  }
+  
+  /* Masquer la barre de défilement sur Chrome/Safari */
+  .pagination-container::-webkit-scrollbar {
+    display: none !important;
+  }
+  
+  /* Style des liens de pagination - plus compact */
+  .pagination-container .page-link, 
+  .pagination-container .page-link:link, 
+  .pagination-container .page-link:visited {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    min-width: 30px !important;
+    height: 30px !important;
+    padding: 0 6px !important;
+    margin: 0 2px !important;
+    font-size: 0.85rem !important;
+    border-radius: 15px !important;
+    background: rgba(74, 144, 226, 0.1) !important;
+    color: rgba(255, 255, 255, 0.7) !important;
+    text-decoration: none !important;
+    transition: all 0.2s ease !important;
+  }
+  
+  /* Page courante */
+  .pagination-container .page-link.current {
+    background: rgba(74, 144, 226, 0.7) !important;
+    color: #fff !important;
+    font-weight: bold !important;
+  }
+  
+  /* Style des boutons précédent/suivant */
+  .pagination-container .page-link:first-child,
+  .pagination-container .page-link:last-child {
+    min-width: auto !important;
+    padding: 0 10px !important;
+    font-size: 0.85rem !important;
+  }
+  
+  /* Style des ellipses */
+  .pagination-container .page-link.disabled {
+    opacity: 0.5 !important;
+    min-width: 26px !important;
+    padding: 0 3px !important;
+    background: transparent !important;
+    font-size: 0.9rem !important;
+  }
+  
+  /* Page active bien mise en évidence */
+  .pagination-container .page-link.current {
+    background: rgba(74, 144, 226, 0.7) !important;
+    color: #fff !important;
+    font-weight: bold !important;
+    transform: scale(1.05) !important;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2) !important;
+  }
+  
+  /* Override spécifique pour les appareils très petits */
+  @media screen and (max-width: 350px) {
+    .pagination-container .page-link, 
+    .pagination-container .page-link:link, 
+    .pagination-container .page-link:visited {
+      min-width: 28px !important;
+      height: 28px !important;
+      padding: 0 4px !important;
+      margin: 0 1px !important;
+      font-size: 0.8rem !important;
+    }
+    
+    .pagination-container .page-link.disabled {
+      min-width: 20px !important;
+      padding: 0 2px !important;
+      font-size: 0.8rem !important;
+    }
+  }
+}

@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, url_for, jsonify
 import os
 import math
+import re
 from constants.series_orders import *
 from constants.eras import ERA_TO_SERIES, ERA_TO_FOLDER, ERA_LABELS
 from constants.rarities import RARITY_ORDER
@@ -407,17 +408,22 @@ def index():
 
     # Pagination : découpe cartes_filtrees en pages modulables
     page = request.args.get('page', 1)
-    per_page = request.args.get('per_page', 150)
+    
+    # Différentes valeurs par défaut pour mobile et desktop
+    default_per_page = 50 if is_mobile_device() else 150
+    per_page = request.args.get('per_page', default_per_page)
+    
     try:
         current_page = int(page)
     except ValueError:
         current_page = 1
+    
     try:
         per_page = int(per_page)
         if per_page not in [50, 100, 150, 200, 250, 300]:
-            per_page = 150  # Valeur par défaut si invalide
+            per_page = default_per_page  # Valeur par défaut selon l'appareil
     except ValueError:
-        per_page = 150
+        per_page = default_per_page
         
     if current_page < 1:
         current_page = 1
@@ -492,6 +498,17 @@ def autocomplete():
         suggestions = []
     suggestions = sorted(suggestions)[:10]
     return jsonify(suggestions)
+
+def is_mobile_device():
+    """
+    Détecte si la requête provient d'un appareil mobile en analysant l'User-Agent
+    """
+    user_agent = request.headers.get('User-Agent', '').lower()
+    mobile_patterns = [
+        'mobile', 'android', 'iphone', 'ipod', 'ipad', 'windows phone',
+        'blackberry', 'opera mini', 'samsung', 'nokia', 'webos'
+    ]
+    return any(pattern in user_agent for pattern in mobile_patterns)
 
 if __name__ == '__main__':
     app.run(debug=True, port=5001)

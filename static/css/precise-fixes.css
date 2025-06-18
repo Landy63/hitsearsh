@@ -1,0 +1,45 @@
+/* Ce fichier contient les ajustements les plus précis pour l'interface mobile */
+
+@media screen and (max-width: 768px) {
+  /* Assurer que le header a une hauteur fixe et précise */
+  .main-header {
+    height: 92px !important;
+    max-height: 92px !important;
+    box-sizing: border-box !important;
+    display: flex !important;
+    align-items: center !important;
+    padding: 0 !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25) !important;
+    border-bottom: 1px solid rgba(74, 144, 226, 0.1) !important;
+  }
+  
+  /* Ajuster la position du menu de filtres pour qu'il soit parfaitement collé au header */
+  .filtres {
+    top: 92px !important; /* Alignement précis avec le header */
+    margin: 0 !important;
+    padding-top: 15px !important;
+    border-top: 1px solid rgba(74, 144, 226, 0.1) !important; /* Légère bordure pour assurer la continuité visuelle */
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.3) !important;
+    max-height: calc(100vh - 92px) !important;
+    overflow-y: auto !important;
+  }
+  
+  /* Assurer que l'overlay s'étend correctement sous le header */
+  .overlay.active {
+    top: 92px !important;
+    height: calc(100% - 92px) !important;
+  }
+  
+  /* Assurer que les éléments du header sont correctement alignés */
+  .header-content {
+    height: 100% !important;
+    box-sizing: border-box !important;
+    align-items: center !important;
+    padding: 0 15px !important;
+  }
+  
+  /* Ajuster la couleur de fond du menu de filtres pour qu'elle corresponde parfaitement au header */
+  .main-header, .filtres {
+    background: linear-gradient(145deg, #212121, #292929) !important;
+  }
+}

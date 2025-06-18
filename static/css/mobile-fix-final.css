@@ -1,0 +1,145 @@
+/* Ce fichier est prioritaire pour les corrections mobiles et va surcharger les autres styles */
+
+/* Réinitialiser toute la mise en page mobile pour éviter les problèmes de décalage */
+@media screen and (max-width: 768px) {
+  /* Structure de base */
+  body, html {
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow-x: hidden !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+  
+  /* Container principal - supprimer toutes les marges */
+  .container {
+    display: block !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    box-sizing: border-box !important;
+  }
+  
+  /* Grille de contenu - occuper toute la largeur disponible */
+  .grille {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 10px !important;
+    box-sizing: border-box !important;
+    overflow-x: hidden !important;
+  }
+  
+  /* Container de cartes - assurer 2 ou 3 colonnes selon la taille */
+  .grille #cards-container {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    grid-gap: 12px !important;
+    width: 100% !important;
+    justify-content: center !important;
+    padding: 0 !important;
+    margin: 0 auto !important;
+    box-sizing: border-box !important;
+  }
+  
+  /* Éliminer l'espace réservé pour le menu filtres */
+  .filtres-container {
+    width: 0 !important;
+    max-width: 0 !important;
+    min-width: 0 !important;
+    height: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    position: static !important;
+    overflow: visible !important;
+  }
+  
+  /* Meilleur affichage des cartes */
+  .carte {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 auto !important;
+    box-sizing: border-box !important;
+    text-align: center !important;
+  }
+  
+  .carte img {
+    width: 100% !important;
+    max-width: 100% !important;
+    height: auto !important;
+    object-fit: contain !important;
+  }
+  
+  /* Menu Filtres s'affichant par-dessus le contenu */
+  .filtres {
+    position: fixed !important;
+    top: 93px !important; /* Exactement sous le header */
+    left: -100% !important;
+    width: 85% !important;
+    max-width: 320px !important;
+    height: calc(100vh - 93px) !important;
+    z-index: 990 !important; /* Z-index inférieur au header */
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5) !important;
+    transition: left 0.3s ease-in-out !important;
+    overflow-y: auto !important;
+  }
+  
+  /* Assurer que la filtres.active s'affiche correctement */
+  .filtres.active {
+    left: 0 !important;
+  }
+  
+  /* Supprimer les marges supplémentaires dans le menu filtres */
+  .filtres details:first-child {
+    margin-top: 0 !important;
+  }
+  
+  /* Header ajusté sur mobile - aligner à gauche */
+  .header-content {
+    padding: 15px 20px !important;
+    justify-content: flex-start !important;
+    gap: 20px !important;
+  }
+  
+  /* Ajuster la taille et position du logo */
+  .logo-container {
+    margin-right: auto !important;
+  }
+  
+  /* Assurer que le header est au-dessus du menu filtres */
+  .main-header {
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 1000 !important;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3) !important;
+  }
+  
+  /* Ajuster le positionnement de la barre de recherche */
+  .search-container {
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+  }
+}
+
+/* Breakpoints plus précis pour les différentes tailles d'écran */
+@media screen and (max-width: 375px) {
+  .grille #cards-container {
+    grid-template-columns: repeat(2, 1fr) !important;
+    grid-gap: 8px !important;
+  }
+}
+
+@media screen and (min-width: 376px) and (max-width: 580px) {
+  .grille #cards-container {
+    grid-template-columns: repeat(2, 1fr) !important;
+    grid-gap: 10px !important;
+  }
+}
+
+@media screen and (min-width: 581px) and (max-width: 768px) {
+  .grille #cards-container {
+    grid-template-columns: repeat(3, 1fr) !important;
+    grid-gap: 12px !important;
+  }
+}

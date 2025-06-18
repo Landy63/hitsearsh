@@ -1,0 +1,40 @@
+/* 
+ * final-spacing-fix.css - Dernières corrections pour les espacements
+ * Élimine les espaces indésirables entre les éléments
+ */
+
+@media screen and (max-width: 768px) {
+  /* Éliminer l'espace entre le sélecteur et les cartes */
+  .grille-header {
+    margin-bottom: 0 !important;
+    padding-bottom: 0 !important;
+  }
+
+  /* S'assurer que le conteneur de cartes commence immédiatement après */
+  #cards-container {
+    margin-top: 0 !important;
+  }
+  
+  /* Ajustement global des cartes */
+  .carte {
+    margin: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+  }
+  
+  /* Optimisation spécifique pour iPhone 14 Pro Max */
+  @media only screen and (min-width: 420px) and (max-width: 440px) and (min-height: 900px) {
+    .grille #cards-container {
+      grid-template-columns: repeat(2, 1fr) !important;
+      padding: 12px !important;
+      grid-gap: 12px !important; 
+    }
+    
+    /* Assurer qu'il n'y a pas de marge latérale additionnelle */
+    .carte img {
+      max-width: 100% !important;
+      border-radius: 10px !important;
+    }
+  }
+}

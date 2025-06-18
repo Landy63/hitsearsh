@@ -1,0 +1,134 @@
+/* 
+ * card-grid-optimized.css - Optimisation de l'affichage des cartes
+ * Ce fichier améliore la disposition des cartes sur mobile pour
+ * une meilleure utilisation de l'espace disponible
+ */
+
+@media screen and (max-width: 768px) {
+  /* Container principal des cartes - optimisé pour mobile */
+  .grille {
+    width: 100% !important;
+    padding: 8px !important; /* Réduction du padding extérieur */
+    margin: 0 !important;
+    box-sizing: border-box !important;
+  }
+  
+  /* Grille de cartes - 3 colonnes par défaut avec espacement réduit */
+  .grille #cards-container {
+    display: grid !important;
+    grid-template-columns: repeat(3, 1fr) !important;
+    grid-gap: 8px !important; /* Écart réduit entre les cartes */
+    width: 98% !important; /* Légèrement réduit pour éviter les débordements */
+    justify-content: center !important;
+    padding: 0 !important;
+    margin: 0 auto !important;
+    box-sizing: border-box !important;
+    overflow: visible !important;
+  }
+  
+  /* Optimisation des cartes individuelles */
+  .carte {
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    box-sizing: border-box !important;
+  }
+  
+  /* Ajustement des images de cartes */
+  .carte img {
+    width: 100% !important;
+    height: auto !important;
+    object-fit: contain !important;
+    border-width: 1px !important; /* Bordure plus fine */
+    box-sizing: border-box !important;
+  }
+  
+  /* Réduction de la taille des noms de cartes */
+  .card-name {
+    font-size: 0.75rem !important;
+    margin-top: 3px !important;
+    margin-bottom: 0 !important;
+    line-height: 1.2 !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+  }
+}
+
+/* Breakpoints optimisés pour différentes tailles d'écran */
+@media screen and (max-width: 320px) {
+  /* Très petits écrans - 2 colonnes uniquement */
+  .grille #cards-container {
+    grid-template-columns: repeat(2, 1fr) !important;
+    grid-gap: 8px !important;
+    padding: 8px !important;
+  }
+  
+  .grille {
+    padding: 0 !important;
+  }
+  
+  .card-name {
+    font-size: 0.7rem !important;
+  }
+}
+
+@media screen and (min-width: 321px) and (max-width: 420px) {
+  /* Petits écrans - 2 colonnes avec espacement moyen */
+  .grille #cards-container {
+    grid-template-columns: repeat(2, 1fr) !important;
+    grid-gap: 10px !important;
+    padding: 10px !important;
+  }
+  
+  .grille {
+    padding: 0 !important;
+  }
+}
+
+@media screen and (min-width: 421px) and (max-width: 450px) {
+  /* iPhone 14 Pro Max et similaires - 2 colonnes avec espacement plus grand */
+  .grille #cards-container {
+    grid-template-columns: repeat(2, 1fr) !important;
+    grid-gap: 12px !important;
+    padding: 12px !important;
+  }
+  
+  .grille {
+    padding: 0 !important;
+  }
+  
+  .card-name {
+    font-size: 0.8rem !important;
+  }
+  
+  /* Élimination de l'espace vide après le sélecteur */
+  .grille-header {
+    margin-bottom: 0 !important;
+  }
+}
+
+@media screen and (min-width: 451px) and (max-width: 768px) {
+  /* Écrans moyens - 3 colonnes */
+  .grille #cards-container {
+    grid-template-columns: repeat(3, 1fr) !important;
+    grid-gap: 10px !important;
+    padding: 10px !important;
+  }
+  
+  .grille {
+    padding: 0 !important;
+  }
+  
+  .card-name {
+    font-size: 0.8rem !important;
+  }
+}
+
+/* Pour les écrans plus larges en mode portrait ou orientation mixte */
+@media screen and (min-width: 540px) and (max-width: 768px) {
+  .grille #cards-container {
+    grid-gap: 12px !important;
+    padding: 12px !important;
+  }
+}
